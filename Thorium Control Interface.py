@@ -104,8 +104,8 @@ class Thorium:
         version = 'Version: 1.0.0'
         date = 'Date: 01/23/2024'
         support = 'Support: '
-        url = 'https://github.com/rhmatti/CUEBIT-Control-Interface'
-        copyrightMessage ='Copyright © 2023 Richard Mattish All Rights Reserved.'
+        url = 'https://github.com/rhmatti/Thorium-Control-Interface'
+        copyrightMessage ='Copyright © 2024 Richard Mattish All Rights Reserved.'
         t = Toplevel(self.root)
         t.wm_title("About")
         t.geometry("400x300")
@@ -113,7 +113,7 @@ class Thorium:
         t.configure(background='white')
         if platform.system() == 'Windows':
             try:
-                t.iconbitmap("icons/CSA.ico")
+                t.iconbitmap("icons/TCI.ico")
             except TclError:
                 print('Program started remotely by another program...')
                 print('No icons will be used')
@@ -125,12 +125,39 @@ class Thorium:
         l3.place(relx = 0.15, rely = 0.35, anchor = W)
         l4 = Label(t, text = support, bg = 'white', font=font_12)
         l4.place(relx = 0.15, rely = 0.45, anchor = W)
-        l5 = Label(t, text = 'https://github.com/rhmatti/\nCUEBIT-Control-Interface', bg = 'white', fg = 'blue', font=font_12)
+        l5 = Label(t, text = 'https://github.com/rhmatti/\nThorium-Control-Interface', bg = 'white', fg = 'blue', font=font_12)
         l5.place(relx = 0.31, rely=0.48, anchor = W)
         l5.bind("<Button-1>", lambda e:
         callback(url))
         messageVar = Message(t, text = copyrightMessage, bg='white', font = font_12, width = 600)
         messageVar.place(relx = 0.5, rely = 1, anchor = S)
+
+    def Instructions(self):
+        instructions = Toplevel(self.root)
+        instructions.geometry('1280x720')
+        instructions.wm_title("User Instructions")
+        instructions.configure(bg='white')
+        if platform.system() == 'Windows':
+            try:
+                instructions.iconbitmap("icons/TCI.ico")
+            except TclError:
+                print('Program started remotely by another program...')
+                print('No icons will be used')
+        v = Scrollbar(instructions, orient = 'vertical')
+        t = Text(instructions, font = font_12, bg='white', width = 100, height = 100, wrap = NONE, yscrollcommand = v.set)
+        t.insert(END, "*********************************************************************************************************************\n")
+        t.insert(END, "Program: Thorium Control Center\n")
+        t.insert(END, "Author: Richard Mattish\n")
+        t.insert(END, "Last Updated: 02/24/2022\n\n")
+        t.insert(END, "Function:  This program provides a graphical user interface for setting\n")
+        t.insert(END, "\tand monitoring the bender and trap electrode voltages for the Thorium\n")
+        t.insert(END, "\tproject.\n")
+        t.insert(END, "*********************************************************************************************************************\n\n\n\n")
+        t.insert(END, "User Instructions\n-------------------------\n")
+        t.insert(END, "Add Instructions Here Later")
+
+        t.pack(side=TOP, fill=X)
+        v.config(command=t.yview)
 
 
     #Creates the Different Menus in the Main Window
@@ -186,7 +213,7 @@ class Thorium:
         self.root.protocol("WM_DELETE_WINDOW", self.quitProgram)
         if platform.system() == 'Windows':
             try:
-                self.root.iconbitmap("icons/CSA.ico")
+                self.root.iconbitmap("icons/TCI.ico")
             except TclError:
                 print('Program started remotely by another program...')
                 print('No icons will be used')
