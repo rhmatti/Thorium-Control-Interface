@@ -34,6 +34,19 @@ import scipy as sp
 from decimal import Decimal
 
 
+class mySpinbox(Spinbox):
+    def __init__(self, *args, **kwargs):
+        Spinbox.__init__(self, *args, **kwargs)
+        self.bind('<MouseWheel>', self.mouseWheel)
+        self.bind('<Button-4>', self.mouseWheel)
+        self.bind('<Button-5>', self.mouseWheel)
+
+    def mouseWheel(self, event):
+        if event.num == 5 or event.delta == -120:
+            self.invoke('buttondown')
+        elif event.num == 4 or event.delta == 120:
+            self.invoke('buttonup')
+
 #Defines location of the Desktop as well as font and text size for use in the software
 desktop = os.path.expanduser("~\Desktop")
 desktop = desktop.replace(os.sep, '/')
@@ -92,11 +105,69 @@ class Thorium:
         self.filename = None
         self.work_dir = None
 
+        #Boolean button variables
+        self.U_bender_bool = False
+        self.bender_mode_bool = False
+
+        #Electrode potentials
+        self.U_bender = 0
+        self.U_TL_bender = 0
+        self.U_TR_bender = -500
+        self.U_BL_bender = 0
+        self.U_BR_bender = 0
+
+        self.U_TL_bender_set = 0
+        self.U_TR_bender_set = -500
+        self.U_BL_bender_set = 0
+        self.U_BR_bender_set = 0
+
+    #This function is run in a separate thread and runs continuously
+    #It reads values of all PLC variables and updates them in the display
+    def data_reader(self):
+
+        self.t_ion = serverValues['Drift_Tubes_T_Ion'][1]
+        self.t_ext = serverValues['Drift_Tubes_T_Ext'][1]
+
+        self.U_0 = serverValues['Drift_Tubes_U0_Read'][1]
+        self.U_0_actual.config(text=f'{int(round(self.U_0,0))} V')
+    
+        time.sleep(0.1)
+
     
     def quitProgram(self):
         print('quit')
         self.root.quit()
         self.root.destroy()
+
+    
+    def click_button(self, button, type, variable, text=None):
+        if type == 'power':
+            self.update_button_var(variable, True)
+            button.config(bg='#50E24B', command=lambda: self.declick_button(button, type, variable), activebackground='#50E24B')
+
+        elif type == 'mode':
+            self.update_button_var(variable, True)
+            button.config(bg='#50E24B', text='Operate Poles\nTogether', command=lambda: self.declick_button(button, type, variable, text), activebackground='#50E24B')
+
+
+
+
+    def declick_button(self, button, type, variable, text=None):
+        if type == 'power':
+            self.update_button_var(variable, False)
+            button.config(bg='grey90', command=lambda: self.click_button(button, type, variable), activebackground='grey90')
+
+        elif type == 'mode':
+            self.update_button_var(variable, False)
+            button.config(bg='#1AA5F6', text='Operate Poles\nSeparately', command=lambda: self.click_button(button, type, variable, text), activebackground='#1AA5F6')
+
+    def update_button_var(self, variable, value):
+        if variable == 'U_bender':
+            self.U_bender_bool = value
+            print('Quadrupole Bender power button pressed')
+        elif variable == 'bender_mode':
+            self.bender_mode_bool = value
+            print('Quadrupole Bender mode button pressed')
     
     #Opens About Window with description of software
     def About(self):
@@ -187,15 +258,149 @@ class Thorium:
         style.configure('TFrame', background='#96CAF2')
         #style.configure('TFrame', background='#F5974F')
         self.tabControl = ttk.Notebook(self.root)
-        self.operation_tab = ttk.Frame(self.tabControl)
-        self.source_tab = ttk.Frame(self.tabControl)
-        self.slit_tab = ttk.Frame(self.tabControl)
+        self.bender_tab = ttk.Frame(self.tabControl)
+        self.loading_tab = ttk.Frame(self.tabControl)
+        self.precision_tab = ttk.Frame(self.tabControl)
 
-        self.tabControl.add(self.operation_tab, text='Bender')
-        self.tabControl.add(self.source_tab, text='Loading Trap')
-        self.tabControl.add(self.slit_tab, text='Precision Trap')
+        self.tabControl.add(self.bender_tab, text='Bender')
+        self.tabControl.add(self.loading_tab, text='Loading Trap')
+        self.tabControl.add(self.precision_tab, text='Precision Trap')
         self.tabControl.pack(expand=1, fill='both')
         #self.tabControl.place(relx=0.5, rely=0, anchor=N)
+
+
+    #Creates the quadrupole bender electrode controls
+    def quad_bender_controls(self, x, y):    
+        self.quad_bender = Frame(self.bender_tab, width = 400, height = 350, background = 'grey90', highlightbackground = 'black', highlightcolor = 'black', highlightthickness = 1)
+        self.quad_bender.place(relx = x, rely = y, anchor = CENTER)
+
+        #Canvas for creating divider lines between controls
+        w = Canvas(self.quad_bender, width=390, height=340, bg='grey90', highlightthickness=0)
+        w.create_line(0, 101, 390, 101)
+        w.create_line(10, 225, 380, 225, dash = (3,2))
+        w.create_line(195, 111, 195, 380, dash = (3, 2))
+        w.place(relx=0.5,rely=0.5,anchor=CENTER)
+
+        quadbenderLabel = Label(self.quad_bender, text = 'Quadrupole Bender', font = font_18, bg = 'grey90', fg = 'black')
+        quadbenderLabel.place(relx=0.5, rely=0.08, anchor = CENTER)
+
+        #Creates bender power button
+        self.quad_bender_button = Button(self.quad_bender, image=self.power_button, command=lambda: self.click_button(self.quad_bender_button, 'power', 'U_bender'), borderwidth=0, bg='grey90', activebackground='grey90')
+        self.quad_bender_button.place(relx=0.1, rely=0.08, anchor=CENTER)
+
+        U_bender_label1 = Label(self.quad_bender, text='U', font=font_14, bg = 'grey90', fg = 'black')
+        U_bender_label1.place(relx=0.15, rely=0.2, anchor=CENTER)
+        U_bender_label2 = Label(self.quad_bender, text='bender', font=('Helvetica', 8), bg = 'grey90', fg = 'black', width=5)
+        U_bender_label2.place(relx=0.165, rely=0.23, anchor=W)
+
+        U_bender_label3 = Label(self.quad_bender, text='=', font=font_14, bg = 'grey90', fg = 'black')
+        U_bender_label3.place(relx=0.31, rely=0.2, anchor=E)
+
+        self.U_bender_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.U_bender_entry.delete(0,"end")
+        self.U_bender_entry.insert(0,int(round(self.U_bender,0)))
+        self.U_bender_entry.place(relx=0.31, rely=0.2, anchor=W, width=70)
+        self.U_bender_entry.bind("<Return>", lambda eff: self.update_U_bender())
+
+        U_bender_label4 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        U_bender_label4.place(relx=0.51, rely=0.2, anchor=CENTER)
+
+        #Creates the bender operation mode button
+        self.bender_mode_button = Button(self.quad_bender, text='Operate Poles\nSeparately', relief = 'raised', command=lambda: self.click_button(self.bender_mode_button, 'mode', 'bender_mode'), width=15, borderwidth=1, bg='#1AA5F6', activebackground='#1AA5F6')
+        self.bender_mode_button.place(relx=0.75, rely=0.2, anchor=CENTER)
+
+
+        #Top Left Bender Electrode GUI
+        TL_label1 = Label(self.quad_bender, text='Top Left', font=font_16, bg = 'grey90', fg = 'black')
+        TL_label1.place(relx=0.25, rely=0.4, anchor=CENTER)
+
+        TL_label2 = Label(self.quad_bender, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        TL_label2.place(relx=0.17, rely=0.5, anchor=E)
+
+        self.TL_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.TL_entry.delete(0,"end")
+        self.TL_entry.insert(0,int(round(self.U_TL_bender,0)))
+        self.TL_entry.place(relx=0.17, rely=0.5, anchor=W, width=70)
+        self.TL_entry.bind("<Return>", lambda eff: self.update_TL())
+
+        TL_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        TL_label3.place(relx=0.37, rely=0.5, anchor=CENTER)
+
+        TL_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        TL_label4.place(relx=0.2, rely=0.6, anchor=E)
+
+        self.TL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.U_TL_bender), font=font_14, bg = 'grey90', fg = 'black')
+        self.TL_actual.place(relx=0.4, rely=0.6, anchor=E)
+
+
+        #Top Right Bender Electrode GUI
+        TR_label1 = Label(self.quad_bender, text='Top Right', font=font_16, bg = 'grey90', fg = 'black')
+        TR_label1.place(relx=0.75, rely=0.4, anchor=CENTER)
+
+        TR_label2 = Label(self.quad_bender, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        TR_label2.place(relx=0.67, rely=0.5, anchor=E)
+
+        self.TR_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.TR_entry.delete(0,"end")
+        self.TR_entry.insert(0,int(round(self.U_TR_bender,0)))
+        self.TR_entry.place(relx=0.67, rely=0.5, anchor=W, width=70)
+        self.TR_entry.bind("<Return>", lambda eff: self.update_TR())
+
+        TR_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        TR_label3.place(relx=0.87, rely=0.5, anchor=CENTER)
+
+        TR_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        TR_label4.place(relx=0.7, rely=0.6, anchor=E)
+
+        self.TR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.U_TR_bender), font=font_14, bg = 'grey90', fg = 'black')
+        self.TR_actual.place(relx=0.9, rely=0.6, anchor=E)
+
+
+        #Bottom Left Bender Electrode GUI
+        BL_label1 = Label(self.quad_bender, text='Bottom Left', font=font_16, bg = 'grey90', fg = 'black')
+        BL_label1.place(relx=0.25, rely=0.75, anchor=CENTER)
+
+        BL_label2 = Label(self.quad_bender, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        BL_label2.place(relx=0.17, rely=0.85, anchor=E)
+
+        self.BL_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.BL_entry.delete(0,"end")
+        self.BL_entry.insert(0,int(round(self.U_BL_bender,0)))
+        self.BL_entry.place(relx=0.17, rely=0.85, anchor=W, width=70)
+        self.BL_entry.bind("<Return>", lambda eff: self.update_BL())
+
+        BL_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        BL_label3.place(relx=0.37, rely=0.85, anchor=CENTER)
+
+        BL_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        BL_label4.place(relx=0.2, rely=0.95, anchor=E)
+
+        self.BL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.U_BL_bender), font=font_14, bg = 'grey90', fg = 'black')
+        self.BL_actual.place(relx=0.4, rely=0.95, anchor=E)
+
+
+        #Bottom Right Bender Electrode GUI
+        BR_label1 = Label(self.quad_bender, text='Bottom Right', font=font_16, bg = 'grey90', fg = 'black')
+        BR_label1.place(relx=0.75, rely=0.75, anchor=CENTER)
+
+        BR_label2 = Label(self.quad_bender, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        BR_label2.place(relx=0.67, rely=0.85, anchor=E)
+
+        self.BR_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.BR_entry.delete(0,"end")
+        self.BR_entry.insert(0,int(round(self.U_BR_bender,0)))
+        self.BR_entry.place(relx=0.67, rely=0.85, anchor=W, width=70)
+        self.BR_entry.bind("<Return>", lambda eff: self.update_BR())
+
+        BR_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        BR_label3.place(relx=0.87, rely=0.85, anchor=CENTER)
+
+        BR_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        BR_label4.place(relx=0.7, rely=0.95, anchor=E)
+
+        self.BR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.U_BR_bender), font=font_14, bg = 'grey90', fg = 'black')
+        self.BR_actual.place(relx=0.9, rely=0.95, anchor=E)
+
 
 
     def makeGui(self, root=None):
@@ -227,6 +432,8 @@ class Thorium:
 
         self.createMenus(menu)
         self.createTabs()
+
+        self.quad_bender_controls(0.12, 0.22)
 
         #multiThreading(self.data_reader)
         self.root.mainloop()
