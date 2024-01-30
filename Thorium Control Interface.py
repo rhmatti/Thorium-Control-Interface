@@ -16,6 +16,9 @@ from turtle import bgcolor
 import webbrowser
 import threading
 
+from twisted.internet import reactor, tksupport
+from twisted.internet.defer import inlineCallbacks
+
 #Import GUI Tools
 from tkinter import *
 from tkinter import ttk
@@ -33,6 +36,15 @@ import numpy as np
 import scipy as sp
 from decimal import Decimal
 
+#Defines location of the Desktop as well as font and text size for use in the software
+desktop = os.path.expanduser("~\Desktop")
+desktop = desktop.replace(os.sep, '/')
+font_12 = ('Helvetica', 12)
+font_14 = ('Helvetica', 14)
+font_16 = ('Helvetica', 16)
+font_18 = ('Helvetica', 18)
+font_20 = ('Helvetica', 20)
+
 
 class mySpinbox(Spinbox):
     def __init__(self, *args, **kwargs):
@@ -46,15 +58,6 @@ class mySpinbox(Spinbox):
             self.invoke('buttondown')
         elif event.num == 4 or event.delta == 120:
             self.invoke('buttonup')
-
-#Defines location of the Desktop as well as font and text size for use in the software
-desktop = os.path.expanduser("~\Desktop")
-desktop = desktop.replace(os.sep, '/')
-font_12 = ('Helvetica', 12)
-font_14 = ('Helvetica', 14)
-font_16 = ('Helvetica', 16)
-font_18 = ('Helvetica', 18)
-font_20 = ('Helvetica', 20)
 
 #Opens a url in a new tab in the default webbrowser
 def callback(url):
@@ -88,14 +91,17 @@ def multiThreading(function):
     t1.start()
 
 #Initializes the program
-def startProgram(root=None):
+def startProgram(root=None, reactor=None):
     instance = Thorium()
+    instance.connect()
     instance.makeGui(root)
+    instance.reactor.run()
 
 
 #This is the EBIT class object, which contains everything related to the GUI control interface
 class Thorium:
-    def __init__(self):
+    def __init__(self, reactor):
+        self.reactor = reactor
 
         #Defines global variables
         self.canvas = None
@@ -109,33 +115,52 @@ class Thorium:
         self.U_bender_bool = False
         self.bender_mode_bool = False
 
-        #Electrode potentials
+        #Electrode actual potentials
         self.U_bender = 0
         self.U_TL_bender = 0
         self.U_TR_bender = -500
         self.U_BL_bender = 0
         self.U_BR_bender = 0
 
+        #Electrode set potentials
         self.U_TL_bender_set = 0
         self.U_TR_bender_set = -500
         self.U_BL_bender_set = 0
         self.U_BR_bender_set = 0
 
+
+        self.connect()
+
+
+    #Connects to Labrad
+    @inlineCallbacks
+    def connect(self):
+        from labrad.wrappers import connectAsync
+        
+        self.cxn = yield connectAsync(name="Thorium Control Center")
+       
+        self.bender_server = yield self.cxn.hv500_bender_server
+        self.loading_server = yield self.cxn.hv500_loading_server
+        print('yup')
+
+        multiThreading(self.data_reader())
+
+
     #This function is run in a separate thread and runs continuously
     #It reads values of all PLC variables and updates them in the display
+    @inlineCallbacks
     def data_reader(self):
-
-        self.t_ion = serverValues['Drift_Tubes_T_Ion'][1]
-        self.t_ext = serverValues['Drift_Tubes_T_Ext'][1]
-
-        self.U_0 = serverValues['Drift_Tubes_U0_Read'][1]
-        self.U_0_actual.config(text=f'{int(round(self.U_0,0))} V')
-    
-        time.sleep(0.1)
+        while True:
+            voltage = yield self.bender_server.get_voltage(15)
+            print(voltage)
+            print('yo')
+        
+            time.sleep(1)
 
     
     def quitProgram(self):
         print('quit')
+        self.reactor.stop()
         self.root.quit()
         self.root.destroy()
 
@@ -241,7 +266,7 @@ class Thorium:
         #filemenu.add_command(label='Settings', command=lambda: self.Settings())
         #filemenu.add_command(label='Calibrate', command=lambda: self.calibration())
         self.filemenu.add_separator()
-        self.filemenu.add_command(label='New Window', command=lambda: startProgram(Toplevel(self.root)))
+        self.filemenu.add_command(label='New Window', command=lambda: startProgram(Toplevel(self.root, self.reactor)))
         self.filemenu.add_command(label='Exit', command=lambda: self.quitProgram())
 
         #Creates Help menu
@@ -406,8 +431,10 @@ class Thorium:
     def makeGui(self, root=None):
         if root == None:
             self.root = Tk()
+            tksupport.install(self.root)
         else:
             self.root = root
+
 
         menu = Menu(self.root)
         self.root.config(menu=menu)
@@ -436,7 +463,15 @@ class Thorium:
         self.quad_bender_controls(0.12, 0.22)
 
         #multiThreading(self.data_reader)
-        self.root.mainloop()
+        #self.root.mainloop()
+        self.reactor.run()          #This line replaces self.root.mainloop() when using Tkinter with Twisted
 
 
-startProgram()
+if __name__ == '__main__':
+    root = Tk()
+    tksupport.install(root)
+    app = Thorium(reactor)
+    app.makeGui(root)
+
+
+#startProgram()
