@@ -93,14 +93,40 @@ def multiThreading(function):
 #Initializes the program
 def startProgram(root=None, reactor=None):
     instance = Thorium()
-    instance.connect()
+    #instance.connect_no_yield()
     instance.makeGui(root)
-    instance.reactor.run()
+    #instance.reactor.run()
 
 
 #This is the EBIT class object, which contains everything related to the GUI control interface
 class Thorium:
-    def __init__(self, reactor):
+    def __init__(self, reactor=None):
+
+        #Dictionary which will store actual voltages of bender electrodes, as read from server
+        #All voltages are initialized as zero upon program start, but will be read by data reader
+        self.bender_voltages = {"U_TR_bender":0, 
+                           "U_TL_bender":0, 
+                           "U_BL_bender":0, 
+                           "U_BR_bender":0, 
+                           "U_TL_plate":0,
+                           "U_TR_plate":0, 
+                           "U_BL_plate":0, 
+                           "U_BR_plate":0, 
+                           "U_L_ablation":0, 
+                           "U_R_ablation":0}
+
+        #Location (server, channel) of electrode voltages on power supplies
+        self.v_location = {"U_TR_bender":("b", 15), 
+                           "U_TL_bender":("b", 12), 
+                           "U_BL_bender":("b", 13), 
+                           "U_BR_bender":("l", 15), 
+                           "U_TL_plate":("l", 14),
+                           "U_TR_plate":("b", 16), 
+                           "U_BL_plate":("l", 16), 
+                           "U_BR_plate":("l", 12), 
+                           "U_L_ablation":("l", 13), 
+                           "U_R_ablation":("b", 14)}
+        
         self.reactor = reactor
 
         #Defines global variables
@@ -115,21 +141,16 @@ class Thorium:
         self.U_bender_bool = False
         self.bender_mode_bool = False
 
-        #Electrode actual potentials
-        self.U_bender = 0
-        self.U_TL_bender = 0
-        self.U_TR_bender = -500
-        self.U_BL_bender = 0
-        self.U_BR_bender = 0
 
         #Electrode set potentials
+        self.U_bender_set = 0
         self.U_TL_bender_set = 0
         self.U_TR_bender_set = -500
         self.U_BL_bender_set = 0
         self.U_BR_bender_set = 0
 
 
-        self.connect()
+        #self.connect()
 
 
     #Connects to Labrad
@@ -146,21 +167,91 @@ class Thorium:
         multiThreading(self.data_reader())
 
 
+
+    def connect_no_yield(self):
+        import labrad
+
+        self.cxn = labrad.connect()
+
+
+        self.bender_server = self.cxn.hv500_bender_server
+        self.loading_server = self.cxn.hv500_loading_server
+
+        #multiThreading(self.data_reader_no_yield())
+
+
+    @inlineCallbacks
+    def getVoltage(self, supply, channel):
+        if supply == 'b':
+            voltage = yield self.bender_server.get_voltage(channel)
+        elif supply == 'l':
+            voltage = yield self.loading_server.get_voltage(channel)
+        print(voltage)
+        return voltage
+
+
     #This function is run in a separate thread and runs continuously
     #It reads values of all PLC variables and updates them in the display
     @inlineCallbacks
     def data_reader(self):
         while True:
-            voltage = yield self.bender_server.get_voltage(15)
-            print(voltage)
-            print('yo')
+            for v in self.v_location:
+                supply = self.v_location[v][0]
+                channel = self.v_location[v][1]
+                if supply == 'b':
+                    voltage = yield self.bender_server.get_voltage(channel)
+                elif supply == 'l':
+                    voltage = yield self.loading_server.get_voltage(channel)
+
+
+                if v == 'U_TR_bender':
+                    #self.U_TR_bender = self.getVoltage(self.v_location[v][0], self.v_location[v][1])
+                    self.U_TR_bender = voltage
+                    print(self.U_TR_bender)
         
             time.sleep(1)
+
+
+    def data_reader_no_yield(self):
+
+        self.connect_no_yield()
+        while True:
+            for v in self.v_location:
+                supply = self.v_location[v][0]
+                channel = self.v_location[v][1]
+                if supply == 'b':
+                    voltage = self.bender_server.get_voltage(channel)
+                elif supply == 'l':
+                    voltage = self.loading_server.get_voltage(channel)
+
+                self.bender_voltages[v] = voltage
+                print(v)
+                print(self.bender_voltages[v])
+
+
+                self.update_labels(v)
+        
+            time.sleep(1)
+
+
+    def update_labels(self, name):
+        if name == 'U_TL_bender':
+            self.TL_actual.config(text="{:.1f} V".format(self.bender_voltages[name]))
+
+        elif name == 'U_TR_bender':
+            self.TR_actual.config(text="{:.1f} V".format(self.bender_voltages[name]))
+        
+        elif name == 'U_BL_bender':
+            self.BL_actual.config(text="{:.1f} V".format(self.bender_voltages[name]))
+
+        elif name == 'U_BR_bender':
+            self.BR_actual.config(text="{:.1f} V".format(self.bender_voltages[name]))
+
 
     
     def quitProgram(self):
         print('quit')
-        self.reactor.stop()
+        #self.reactor.stop()
         self.root.quit()
         self.root.destroy()
 
@@ -323,7 +414,7 @@ class Thorium:
 
         self.U_bender_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
         self.U_bender_entry.delete(0,"end")
-        self.U_bender_entry.insert(0,int(round(self.U_bender,0)))
+        self.U_bender_entry.insert(0,int(round(self.U_bender_set,0)))
         self.U_bender_entry.place(relx=0.31, rely=0.2, anchor=W, width=70)
         self.U_bender_entry.bind("<Return>", lambda eff: self.update_U_bender())
 
@@ -344,7 +435,7 @@ class Thorium:
 
         self.TL_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
         self.TL_entry.delete(0,"end")
-        self.TL_entry.insert(0,int(round(self.U_TL_bender,0)))
+        self.TL_entry.insert(0,int(round(self.U_TL_bender_set,0)))
         self.TL_entry.place(relx=0.17, rely=0.5, anchor=W, width=70)
         self.TL_entry.bind("<Return>", lambda eff: self.update_TL())
 
@@ -354,7 +445,7 @@ class Thorium:
         TL_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
         TL_label4.place(relx=0.2, rely=0.6, anchor=E)
 
-        self.TL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.U_TL_bender), font=font_14, bg = 'grey90', fg = 'black')
+        self.TL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.bender_voltages['U_TL_bender']), font=font_14, bg = 'grey90', fg = 'black')
         self.TL_actual.place(relx=0.4, rely=0.6, anchor=E)
 
 
@@ -367,7 +458,7 @@ class Thorium:
 
         self.TR_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
         self.TR_entry.delete(0,"end")
-        self.TR_entry.insert(0,int(round(self.U_TR_bender,0)))
+        self.TR_entry.insert(0,int(round(self.U_TR_bender_set,0)))
         self.TR_entry.place(relx=0.67, rely=0.5, anchor=W, width=70)
         self.TR_entry.bind("<Return>", lambda eff: self.update_TR())
 
@@ -377,7 +468,7 @@ class Thorium:
         TR_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
         TR_label4.place(relx=0.7, rely=0.6, anchor=E)
 
-        self.TR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.U_TR_bender), font=font_14, bg = 'grey90', fg = 'black')
+        self.TR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.bender_voltages['U_TR_bender']), font=font_14, bg = 'grey90', fg = 'black')
         self.TR_actual.place(relx=0.9, rely=0.6, anchor=E)
 
 
@@ -390,7 +481,7 @@ class Thorium:
 
         self.BL_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
         self.BL_entry.delete(0,"end")
-        self.BL_entry.insert(0,int(round(self.U_BL_bender,0)))
+        self.BL_entry.insert(0,int(round(self.U_BL_bender_set,0)))
         self.BL_entry.place(relx=0.17, rely=0.85, anchor=W, width=70)
         self.BL_entry.bind("<Return>", lambda eff: self.update_BL())
 
@@ -400,7 +491,7 @@ class Thorium:
         BL_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
         BL_label4.place(relx=0.2, rely=0.95, anchor=E)
 
-        self.BL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.U_BL_bender), font=font_14, bg = 'grey90', fg = 'black')
+        self.BL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.bender_voltages['U_BL_bender']), font=font_14, bg = 'grey90', fg = 'black')
         self.BL_actual.place(relx=0.4, rely=0.95, anchor=E)
 
 
@@ -413,7 +504,7 @@ class Thorium:
 
         self.BR_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
         self.BR_entry.delete(0,"end")
-        self.BR_entry.insert(0,int(round(self.U_BR_bender,0)))
+        self.BR_entry.insert(0,int(round(self.U_BR_bender_set,0)))
         self.BR_entry.place(relx=0.67, rely=0.85, anchor=W, width=70)
         self.BR_entry.bind("<Return>", lambda eff: self.update_BR())
 
@@ -423,7 +514,7 @@ class Thorium:
         BR_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
         BR_label4.place(relx=0.7, rely=0.95, anchor=E)
 
-        self.BR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.U_BR_bender), font=font_14, bg = 'grey90', fg = 'black')
+        self.BR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.bender_voltages['U_BR_bender']), font=font_14, bg = 'grey90', fg = 'black')
         self.BR_actual.place(relx=0.9, rely=0.95, anchor=E)
 
 
@@ -462,16 +553,17 @@ class Thorium:
 
         self.quad_bender_controls(0.12, 0.22)
 
-        #multiThreading(self.data_reader)
-        #self.root.mainloop()
-        self.reactor.run()          #This line replaces self.root.mainloop() when using Tkinter with Twisted
+        multiThreading(self.data_reader_no_yield)
+        #self.connect_no_yield()
+        self.root.mainloop()
+        #self.reactor.run()          #This line replaces self.root.mainloop() when using Tkinter with Twisted
 
 
-if __name__ == '__main__':
-    root = Tk()
-    tksupport.install(root)
-    app = Thorium(reactor)
-    app.makeGui(root)
+# if __name__ == '__main__':
+#     root = Tk()
+#     tksupport.install(root)
+#     app = Thorium(reactor)
+#     app.makeGui(root)
 
 
-#startProgram()
+startProgram()
