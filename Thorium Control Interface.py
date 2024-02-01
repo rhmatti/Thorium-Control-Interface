@@ -546,6 +546,7 @@ class Thorium:
         self.U_bender_entry.insert(0,int(round(self.U_bender,0)))
         self.U_bender_entry.place(relx=0.31, rely=0.2, anchor=W, width=70)
         self.U_bender_entry.bind("<Return>", lambda eff: self.updateEntryV('U_bender'))
+        self.U_bender_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_bender'))
 
         U_bender_label4 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         U_bender_label4.place(relx=0.51, rely=0.2, anchor=CENTER)
@@ -567,6 +568,7 @@ class Thorium:
         self.TL_entry.insert(0,int(round(self.entry_voltages['U_TL_bender'],0)))
         self.TL_entry.place(relx=0.17, rely=0.5, anchor=W, width=70)
         self.TL_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TL_bender'))
+        self.TL_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TL_bender'))
 
         TL_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         TL_label3.place(relx=0.37, rely=0.5, anchor=CENTER)
@@ -590,6 +592,7 @@ class Thorium:
         self.TR_entry.insert(0,int(round(self.entry_voltages['U_TR_bender'],0)))
         self.TR_entry.place(relx=0.67, rely=0.5, anchor=W, width=70)
         self.TR_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TR_bender'))
+        self.TR_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TR_bender'))
 
         TR_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         TR_label3.place(relx=0.87, rely=0.5, anchor=CENTER)
@@ -613,6 +616,7 @@ class Thorium:
         self.BL_entry.insert(0,int(round(self.entry_voltages['U_BL_bender'],0)))
         self.BL_entry.place(relx=0.17, rely=0.85, anchor=W, width=70)
         self.BL_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BL_bender'))
+        self.BL_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BL_bender'))
 
         BL_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         BL_label3.place(relx=0.37, rely=0.85, anchor=CENTER)
@@ -636,6 +640,7 @@ class Thorium:
         self.BR_entry.insert(0,int(round(self.entry_voltages['U_BR_bender'],0)))
         self.BR_entry.place(relx=0.67, rely=0.85, anchor=W, width=70)
         self.BR_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BR_bender'))
+        self.BR_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BR_bender'))
 
         BR_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         BR_label3.place(relx=0.87, rely=0.85, anchor=CENTER)
@@ -681,6 +686,7 @@ class Thorium:
         self.TLP_entry.insert(0,int(round(self.entry_voltages['U_TL_plate'],0)))
         self.TLP_entry.place(relx=0.17, rely=0.28, anchor=W, width=70)
         self.TLP_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TL_plate'))
+        self.TLP_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TL_plate'))
 
         TL_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
         TL_label3.place(relx=0.37, rely=0.28, anchor=CENTER)
@@ -704,6 +710,7 @@ class Thorium:
         self.TRP_entry.insert(0,int(round(self.entry_voltages['U_TR_plate'],0)))
         self.TRP_entry.place(relx=0.67, rely=0.28, anchor=W, width=70)
         self.TRP_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TR_plate'))
+        self.TRP_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TR_plate'))
 
         TR_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
         TR_label3.place(relx=0.87, rely=0.28, anchor=CENTER)
@@ -727,6 +734,7 @@ class Thorium:
         self.BLP_entry.insert(0,int(round(self.entry_voltages['U_BL_plate'],0)))
         self.BLP_entry.place(relx=0.17, rely=0.58, anchor=W, width=70)
         self.BLP_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BL_plate'))
+        self.BLP_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BL_plate'))
 
         BL_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
         BL_label3.place(relx=0.37, rely=0.58, anchor=CENTER)
@@ -750,6 +758,7 @@ class Thorium:
         self.BRP_entry.insert(0,int(round(self.entry_voltages['U_BR_plate'],0)))
         self.BRP_entry.place(relx=0.67, rely=0.58, anchor=W, width=70)
         self.BRP_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BR_plate'))
+        self.BRP_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BR_plate'))
 
         BR_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
         BR_label3.place(relx=0.87, rely=0.58, anchor=CENTER)
@@ -773,6 +782,7 @@ class Thorium:
         self.LA_entry.insert(0,int(round(self.entry_voltages['U_L_ablation'],0)))
         self.LA_entry.place(relx=0.17, rely=0.88, anchor=W, width=70)
         self.LA_entry.bind("<Return>", lambda eff: self.updateEntryV('U_L_ablation'))
+        self.LA_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_L_ablation'))
 
         LA_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
         LA_label3.place(relx=0.37, rely=0.88, anchor=CENTER)
@@ -796,6 +806,7 @@ class Thorium:
         self.RA_entry.insert(0,int(round(self.entry_voltages['U_R_ablation'],0)))
         self.RA_entry.place(relx=0.67, rely=0.88, anchor=W, width=70)
         self.RA_entry.bind("<Return>", lambda eff: self.updateEntryV('U_R_ablation'))
+        self.RA_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_R_ablation'))
 
         RA_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
         RA_label3.place(relx=0.87, rely=0.88, anchor=CENTER)
@@ -832,7 +843,7 @@ class Thorium:
         try:
             image = Image.open('images/power-button.png')
         except:
-            image = Image.open('C:/Users/cuebit-control/Downloads/CUEBIT-Control-Interface-main/images/power-button.png')
+            image = Image.open('C:/Users/Dirac/Downloads/Thorium-Control-Interface-main/images/power-button.png')
         image = image.resize((30,32))
         self.power_button = ImageTk.PhotoImage(image)
 
