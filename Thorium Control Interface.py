@@ -1,10 +1,10 @@
-#Thorium Trap Controls
+#Thorium Control Interface
 #Author: Richard Mattish
-#Last Updated: 01/23/2024
+#Last Updated: 01/31/2024
 
 
 #Function:  This program provides a graphical user interface for setting
-#           and monitoring trap electrode voltages for the Thorium Project.
+#           and monitoring trap electrode voltages for the Thorium Project
 
 
 #Import General Tools
@@ -104,7 +104,7 @@ class Thorium:
 
         #Dictionary which will store actual voltages of bender electrodes, as read from server
         #All voltages are initialized as zero upon program start, but will be read by data reader
-        self.bender_voltages = {"U_TR_bender":0, 
+        self.actual_voltages = {"U_TR_bender":0, 
                            "U_TL_bender":0, 
                            "U_BL_bender":0, 
                            "U_BR_bender":0, 
@@ -118,7 +118,21 @@ class Thorium:
 
         #Dictionary which will store set voltages of bender electrodes, as specified by user in program
         #All set voltages are initialized as zero upon program start
-        self.bender_set_voltages = {"U_TR_bender":0, 
+        self.set_voltages = {"U_TR_bender":0, 
+                           "U_TL_bender":0, 
+                           "U_BL_bender":0, 
+                           "U_BR_bender":0, 
+                           "U_TL_plate":0,
+                           "U_TR_plate":0, 
+                           "U_BL_plate":0, 
+                           "U_BR_plate":0, 
+                           "U_L_ablation":0, 
+                           "U_R_ablation":0}
+        
+
+        #Dictionary which will store voltages that user has typed into entry boxes
+        #These are not necessarily the same as set voltages, since power buttons, etc. may be switched
+        self.entry_voltages = {"U_TR_bender":0, 
                            "U_TL_bender":0, 
                            "U_BL_bender":0, 
                            "U_BR_bender":0, 
@@ -187,13 +201,8 @@ class Thorium:
         import labrad
 
         self.cxn = labrad.connect()
-
-
         self.bender_server = self.cxn.hv500_bender_server
         self.loading_server = self.cxn.hv500_loading_server
-
-
-        #multiThreading(self.data_reader_no_yield())
 
 
 
@@ -211,9 +220,9 @@ class Thorium:
         supply = self.v_location[name][0]
         channel = self.v_location[name][1]
         if supply == 'b':
-            self.bender_server.set_voltage(channel, self.bender_set_voltages[name])
+            self.bender_server.set_voltage(channel, self.set_voltages[name])
         elif supply == 'l':
-            self.loading_server.set_voltage(channel, self.bender_set_voltages[name])
+            self.loading_server.set_voltage(channel, self.set_voltages[name])
 
 
     # #This function is run in a separate thread and runs continuously
@@ -240,15 +249,17 @@ class Thorium:
 
     def data_reader_no_yield(self):
 
-        self.connect_no_yield()
+        #self.connect_no_yield()
 
         while True:
+            self.updateSetV()
+
             for v in self.v_location:
-                self.bender_voltages[v] = self.getVoltage(v)
+                self.actual_voltages[v] = self.getVoltage(v)
 
-                print(f'{v} = {self.bender_voltages[v]}')
+                print(f'{v} = {self.actual_voltages[v]}')
 
-                if abs(self.bender_voltages[v] - self.bender_set_voltages[v]) > 0.2:
+                if abs(self.actual_voltages[v] - self.set_voltages[v]) > 0.2:
                     self.setVoltage(v)
 
                 self.updateActualV(v)
@@ -258,42 +269,61 @@ class Thorium:
 
     def updateActualV(self, name):
         if name == 'U_TL_bender':
-            self.TL_actual.config(text="{:.1f} V".format(self.bender_voltages[name]))
+            self.TL_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
 
         elif name == 'U_TR_bender':
-            self.TR_actual.config(text="{:.1f} V".format(self.bender_voltages[name]))
+            self.TR_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
         
         elif name == 'U_BL_bender':
-            self.BL_actual.config(text="{:.1f} V".format(self.bender_voltages[name]))
+            self.BL_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
 
         elif name == 'U_BR_bender':
-            self.BR_actual.config(text="{:.1f} V".format(self.bender_voltages[name]))
+            self.BR_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
 
     
 
-    def updateSetV(self, name):
+    def updateEntryV(self, name):
+        if name == 'U_bender':
+            self.U_bender = float(self.U_bender_entry.get())
+            self.U_bender_entry.delete(0, END)
+            self.U_bender_entry.insert(0, int(round(self.U_bender,0)))
 
-        if name == 'U_TL_bender':
-            self.bender_set_voltages[name] = float(self.TL_entry.get())
+        elif name == 'U_TL_bender':
+            self.entry_voltages[name] = float(self.TL_entry.get())
             self.TL_entry.delete(0, END)
-            self.TL_entry.insert(0, int(round(self.bender_set_voltages[name],0)))
-
+            self.TL_entry.insert(0, int(round(self.entry_voltages[name],0)))
 
         elif name == 'U_TR_bender':
-            self.bender_set_voltages[name] = float(self.TR_entry.get())
+            self.entry_voltages[name] = float(self.TR_entry.get())
             self.TR_entry.delete(0, END)
-            self.TR_entry.insert(0, int(round(self.bender_set_voltages[name],0)))
+            self.TR_entry.insert(0, int(round(self.entry_voltages[name],0)))
         
         elif name == 'U_BL_bender':
-            self.bender_set_voltages[name] = float(self.BL_entry.get())
+            self.entry_voltages[name] = float(self.BL_entry.get())
             self.BL_entry.delete(0, END)
-            self.BL_entry.insert(0, int(round(self.bender_set_voltages[name],0)))
+            self.BL_entry.insert(0, int(round(self.entry_voltages[name],0)))
 
         elif name == 'U_BR_bender':
-            self.bender_set_voltages[name] = float(self.BR_entry.get())
+            self.entry_voltages[name] = float(self.BR_entry.get())
             self.BR_entry.delete(0, END)
-            self.BR_entry.insert(0, int(round(self.bender_set_voltages[name],0)))
+            self.BR_entry.insert(0, int(round(self.entry_voltages[name],0)))
 
+
+    def updateSetV(self):
+        quad_names = ['U_TL_bender', 'U_TR_bender', 'U_BL_bender', 'U_BR_bender']
+
+        if self.U_bender_bool:
+            if self.bender_mode_bool:
+                for name in quad_names:
+                    self.set_voltages[name] = self.entry_voltages[name]
+            else:
+                self.set_voltages['U_TL_bender'] = -self.U_bender
+                self.set_voltages['U_TR_bender'] = self.U_bender
+                self.set_voltages['U_BL_bender'] = self.U_bender
+                self.set_voltages['U_BR_bender'] = -self.U_bender
+        else:
+            for name in quad_names:
+                self.set_voltages[name] = 0
 
 
 
@@ -310,12 +340,10 @@ class Thorium:
 
 
     def declick_button(self, button, type, variable, text=None):
+        self.update_button_var(variable, False)
         if type == 'power':
-            self.update_button_var(variable, False)
             button.config(bg='grey90', command=lambda: self.click_button(button, type, variable), activebackground='grey90')
-
         elif type == 'mode':
-            self.update_button_var(variable, False)
             button.config(bg='#1AA5F6', text='Operate Poles\nSeparately', command=lambda: self.click_button(button, type, variable, text), activebackground='#1AA5F6')
 
     def update_button_var(self, variable, value):
@@ -330,7 +358,7 @@ class Thorium:
     def About(self):
         name = "Thorium Control Center"
         version = 'Version: 1.0.0'
-        date = 'Date: 01/23/2024'
+        date = 'Date: 01/31/2024'
         support = 'Support: '
         url = 'https://github.com/rhmatti/Thorium-Control-Interface'
         copyrightMessage ='Copyright © 2024 Richard Mattish All Rights Reserved.'
@@ -398,7 +426,7 @@ class Thorium:
         #filemenu.add_command(label='Settings', command=lambda: self.Settings())
         #filemenu.add_command(label='Calibrate', command=lambda: self.calibration())
         self.filemenu.add_separator()
-        self.filemenu.add_command(label='New Window', command=lambda: startProgram(Toplevel(self.root, self.reactor)))
+        self.filemenu.add_command(label='New Window', command=lambda: startProgram(Toplevel(self.root)))
         self.filemenu.add_command(label='Exit', command=lambda: self.quitProgram())
 
         #Creates Help menu
@@ -457,7 +485,7 @@ class Thorium:
         self.U_bender_entry.delete(0,"end")
         self.U_bender_entry.insert(0,int(round(self.U_bender,0)))
         self.U_bender_entry.place(relx=0.31, rely=0.2, anchor=W, width=70)
-        self.U_bender_entry.bind("<Return>", lambda eff: self.setVoltage('U_bender'))
+        self.U_bender_entry.bind("<Return>", lambda eff: self.updateEntryV('U_bender'))
 
         U_bender_label4 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         U_bender_label4.place(relx=0.51, rely=0.2, anchor=CENTER)
@@ -476,9 +504,9 @@ class Thorium:
 
         self.TL_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
         self.TL_entry.delete(0,"end")
-        self.TL_entry.insert(0,int(round(self.bender_set_voltages['U_TL_bender'],0)))
+        self.TL_entry.insert(0,int(round(self.entry_voltages['U_TL_bender'],0)))
         self.TL_entry.place(relx=0.17, rely=0.5, anchor=W, width=70)
-        self.TL_entry.bind("<Return>", lambda eff: self.updateSetV('U_TL_bender'))
+        self.TL_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TL_bender'))
 
         TL_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         TL_label3.place(relx=0.37, rely=0.5, anchor=CENTER)
@@ -486,7 +514,7 @@ class Thorium:
         TL_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
         TL_label4.place(relx=0.2, rely=0.6, anchor=E)
 
-        self.TL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.bender_voltages['U_TL_bender']), font=font_14, bg = 'grey90', fg = 'black')
+        self.TL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.actual_voltages['U_TL_bender']), font=font_14, bg = 'grey90', fg = 'black')
         self.TL_actual.place(relx=0.4, rely=0.6, anchor=E)
 
 
@@ -499,9 +527,9 @@ class Thorium:
 
         self.TR_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
         self.TR_entry.delete(0,"end")
-        self.TR_entry.insert(0,int(round(self.bender_set_voltages['U_TR_bender'],0)))
+        self.TR_entry.insert(0,int(round(self.entry_voltages['U_TR_bender'],0)))
         self.TR_entry.place(relx=0.67, rely=0.5, anchor=W, width=70)
-        self.TR_entry.bind("<Return>", lambda eff: self.updateSetV('U_TR_bender'))
+        self.TR_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TR_bender'))
 
         TR_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         TR_label3.place(relx=0.87, rely=0.5, anchor=CENTER)
@@ -509,7 +537,7 @@ class Thorium:
         TR_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
         TR_label4.place(relx=0.7, rely=0.6, anchor=E)
 
-        self.TR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.bender_voltages['U_TR_bender']), font=font_14, bg = 'grey90', fg = 'black')
+        self.TR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.actual_voltages['U_TR_bender']), font=font_14, bg = 'grey90', fg = 'black')
         self.TR_actual.place(relx=0.9, rely=0.6, anchor=E)
 
 
@@ -522,9 +550,9 @@ class Thorium:
 
         self.BL_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
         self.BL_entry.delete(0,"end")
-        self.BL_entry.insert(0,int(round(self.bender_set_voltages['U_BL_bender'],0)))
+        self.BL_entry.insert(0,int(round(self.entry_voltages['U_BL_bender'],0)))
         self.BL_entry.place(relx=0.17, rely=0.85, anchor=W, width=70)
-        self.BL_entry.bind("<Return>", lambda eff: self.updateSetV('U_BL_bender'))
+        self.BL_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BL_bender'))
 
         BL_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         BL_label3.place(relx=0.37, rely=0.85, anchor=CENTER)
@@ -532,7 +560,7 @@ class Thorium:
         BL_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
         BL_label4.place(relx=0.2, rely=0.95, anchor=E)
 
-        self.BL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.bender_voltages['U_BL_bender']), font=font_14, bg = 'grey90', fg = 'black')
+        self.BL_actual = Label(self.quad_bender, text="{:.1f} V".format(self.actual_voltages['U_BL_bender']), font=font_14, bg = 'grey90', fg = 'black')
         self.BL_actual.place(relx=0.4, rely=0.95, anchor=E)
 
 
@@ -545,9 +573,9 @@ class Thorium:
 
         self.BR_entry = mySpinbox(self.quad_bender, from_=-500, to=500, font=font_14, justify=RIGHT)
         self.BR_entry.delete(0,"end")
-        self.BR_entry.insert(0,int(round(self.bender_set_voltages['U_BR_bender'],0)))
+        self.BR_entry.insert(0,int(round(self.entry_voltages['U_BR_bender'],0)))
         self.BR_entry.place(relx=0.67, rely=0.85, anchor=W, width=70)
-        self.BR_entry.bind("<Return>", lambda eff: self.updateSetV('U_BR_bender'))
+        self.BR_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BR_bender'))
 
         BR_label3 = Label(self.quad_bender, text='V', font=font_14, bg = 'grey90', fg = 'black')
         BR_label3.place(relx=0.87, rely=0.85, anchor=CENTER)
@@ -555,18 +583,17 @@ class Thorium:
         BR_label4 = Label(self.quad_bender, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
         BR_label4.place(relx=0.7, rely=0.95, anchor=E)
 
-        self.BR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.bender_voltages['U_BR_bender']), font=font_14, bg = 'grey90', fg = 'black')
+        self.BR_actual = Label(self.quad_bender, text="{:.1f} V".format(self.actual_voltages['U_BR_bender']), font=font_14, bg = 'grey90', fg = 'black')
         self.BR_actual.place(relx=0.9, rely=0.95, anchor=E)
 
 
-
+    #Creates the main GUI window
     def makeGui(self, root=None):
         if root == None:
             self.root = Tk()
             #tksupport.install(self.root)
         else:
             self.root = root
-
 
         menu = Menu(self.root)
         self.root.config(menu=menu)
@@ -606,5 +633,9 @@ class Thorium:
 #     app = Thorium(reactor)
 #     app.makeGui(root)
 
-
-startProgram()
+#Initializes the program
+if __name__ == '__main__':
+    instance = Thorium()
+    instance.makeGui()
+        
+#startProgram()
