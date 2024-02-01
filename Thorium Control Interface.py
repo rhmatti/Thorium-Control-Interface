@@ -249,7 +249,7 @@ class Thorium:
 
     def data_reader_no_yield(self):
 
-        #self.connect_no_yield()
+        self.connect_no_yield()
 
         while True:
             self.updateSetV()
@@ -264,7 +264,7 @@ class Thorium:
 
                 self.updateActualV(v)
         
-            time.sleep(1)
+            time.sleep(0.1)
 
 
     def updateActualV(self, name):
