@@ -1,6 +1,6 @@
 #Thorium Control Interface
 #Author: Richard Mattish
-#Last Updated: 01/31/2024
+#Last Updated: 02/01/2024
 
 
 #Function:  This program provides a graphical user interface for setting
@@ -280,6 +280,24 @@ class Thorium:
 
         elif name == 'U_BR_bender':
             self.BR_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
+        
+        elif name == 'U_TL_plate':
+            self.TLP_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
+
+        elif name == 'U_TR_plate':
+            self.TRP_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
+
+        elif name == 'U_BL_plate':
+            self.BLP_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
+
+        elif name == 'U_BR_plate':
+            self.BRP_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
+
+        elif name == 'U_L_ablation':
+            self.LA_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
+
+        elif name == 'U_R_ablation':
+            self.RA_actual.config(text="{:.1f} V".format(self.actual_voltages[name]))
 
     
 
@@ -400,7 +418,7 @@ class Thorium:
     def About(self):
         name = "Thorium Control Center"
         version = 'Version: 1.0.0'
-        date = 'Date: 01/31/2024'
+        date = 'Date: 02/01/2024'
         support = 'Support: '
         url = 'https://github.com/rhmatti/Thorium-Control-Interface'
         copyrightMessage ='Copyright © 2024 Richard Mattish All Rights Reserved.'
@@ -821,11 +839,11 @@ class Thorium:
         self.createMenus(menu)
         self.createTabs()
 
-        self.quad_bender_controls(0.12, 0.22)
+        self.quad_bender_controls(0.4, 0.245)
 
-        self.extraction_controls(0.4, 0.295)
+        self.extraction_controls(0.15, 0.295)
 
-        #multiThreading(self.data_reader_no_yield)
+        multiThreading(self.data_reader_no_yield)
         #self.connect_no_yield()
         self.root.mainloop()
         #self.reactor.run()          #This line replaces self.root.mainloop() when using Tkinter with Twisted
