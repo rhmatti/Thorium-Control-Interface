@@ -171,6 +171,7 @@ class Thorium:
         #Boolean button variables
         self.U_bender_bool = False
         self.bender_mode_bool = False
+        self.U_extraction_bool = False
 
 
         #self.connect()
@@ -308,9 +309,40 @@ class Thorium:
             self.BR_entry.delete(0, END)
             self.BR_entry.insert(0, int(round(self.entry_voltages[name],0)))
 
+        elif name == 'U_TL_plate':
+            self.entry_voltages[name] = float(self.TLP_entry.get())
+            self.TLP_entry.delete(0, END)
+            self.TLP_entry.insert(0, int(round(self.entry_voltages[name],0)))
+
+        elif name == 'U_TR_plate':
+            self.entry_voltages[name] = float(self.TRP_entry.get())
+            self.TRP_entry.delete(0, END)
+            self.TRP_entry.insert(0, int(round(self.entry_voltages[name],0)))
+
+        elif name == 'U_BL_plate':
+            self.entry_voltages[name] = float(self.BLP_entry.get())
+            self.BLP_entry.delete(0, END)
+            self.BLP_entry.insert(0, int(round(self.entry_voltages[name],0)))
+
+        elif name == 'U_BR_plate':
+            self.entry_voltages[name] = float(self.BRP_entry.get())
+            self.BRP_entry.delete(0, END)
+            self.BRP_entry.insert(0, int(round(self.entry_voltages[name],0)))
+
+        elif name == 'U_L_ablation':
+            self.entry_voltages[name] = float(self.LA_entry.get())
+            self.LA_entry.delete(0, END)
+            self.LA_entry.insert(0, int(round(self.entry_voltages[name],0)))
+
+        elif name == 'U_R_ablation':
+            self.entry_voltages[name] = float(self.RA_entry.get())
+            self.RA_entry.delete(0, END)
+            self.RA_entry.insert(0, int(round(self.entry_voltages[name],0)))
+
 
     def updateSetV(self):
         quad_names = ['U_TL_bender', 'U_TR_bender', 'U_BL_bender', 'U_BR_bender']
+        extraction_names = ['U_TL_plate', 'U_TR_plate', 'U_BL_plate', 'U_BR_plate', 'U_L_ablation', 'U_L_ablation']
 
         if self.U_bender_bool:
             if self.bender_mode_bool:
@@ -323,6 +355,13 @@ class Thorium:
                 self.set_voltages['U_BR_bender'] = -self.U_bender
         else:
             for name in quad_names:
+                self.set_voltages[name] = 0
+
+        if self.U_extraction_bool:
+            for name in extraction_names:
+                self.set_voltages[name] = self.entry_voltages[name]
+        else:
+            for name in extraction_names:
                 self.set_voltages[name] = 0
 
 
@@ -353,6 +392,9 @@ class Thorium:
         elif variable == 'bender_mode':
             self.bender_mode_bool = value
             print('Quadrupole Bender mode button pressed')
+        elif variable == 'U_extraction':
+            self.U_extraction_bool = value
+            print('Ion Extraction power button pressed')
     
     #Opens About Window with description of software
     def About(self):
@@ -463,7 +505,7 @@ class Thorium:
         w = Canvas(self.quad_bender, width=390, height=340, bg='grey90', highlightthickness=0)
         w.create_line(0, 101, 390, 101)
         w.create_line(10, 225, 380, 225, dash = (3,2))
-        w.create_line(195, 111, 195, 380, dash = (3, 2))
+        w.create_line(195, 111, 195, 335, dash = (3, 2))
         w.place(relx=0.5,rely=0.5,anchor=CENTER)
 
         quadbenderLabel = Label(self.quad_bender, text = 'Quadrupole Bender', font = font_18, bg = 'grey90', fg = 'black')
@@ -587,6 +629,166 @@ class Thorium:
         self.BR_actual.place(relx=0.9, rely=0.95, anchor=E)
 
 
+    
+    #Creates the ion extraction/ablation electrode controls
+    def extraction_controls(self, x, y):    
+        self.extraction = Frame(self.bender_tab, width = 400, height = 450, background = 'grey90', highlightbackground = 'black', highlightcolor = 'black', highlightthickness = 1)
+        self.extraction.place(relx = x, rely = y, anchor = CENTER)
+
+        #Canvas for creating divider lines between controls
+        w = Canvas(self.extraction, width=390, height=440, bg='grey90', highlightthickness=0)
+        w.create_line(0, 55, 390, 55)
+        w.create_line(10, 185, 380, 185, dash = (3,2))
+        w.create_line(10, 320, 380, 320, dash = (3,2))
+        w.create_line(195, 65, 195, 435, dash = (3, 2))
+        w.place(relx=0.5,rely=0.5,anchor=CENTER)
+
+        extractionLabel = Label(self.extraction, text = 'Ion Extraction', font = font_18, bg = 'grey90', fg = 'black')
+        extractionLabel.place(relx=0.5, rely=0.062, anchor = CENTER)
+
+        #Creates bender power button
+        self.extraction_button = Button(self.extraction, image=self.power_button, command=lambda: self.click_button(self.extraction_button, 'power', 'U_extraction'), borderwidth=0, bg='grey90', activebackground='grey90')
+        self.extraction_button.place(relx=0.1, rely=0.062, anchor=CENTER)
+
+
+        #Top Left Extraction Plate Electrode GUI
+        TL_label1 = Label(self.extraction, text='Top Left Plate', font=font_16, bg = 'grey90', fg = 'black')
+        TL_label1.place(relx=0.25, rely=0.2, anchor=CENTER)
+
+        TL_label2 = Label(self.extraction, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        TL_label2.place(relx=0.17, rely=0.28, anchor=E)
+
+        self.TLP_entry = mySpinbox(self.extraction, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.TLP_entry.delete(0,"end")
+        self.TLP_entry.insert(0,int(round(self.entry_voltages['U_TL_plate'],0)))
+        self.TLP_entry.place(relx=0.17, rely=0.28, anchor=W, width=70)
+        self.TLP_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TL_plate'))
+
+        TL_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        TL_label3.place(relx=0.37, rely=0.28, anchor=CENTER)
+
+        TL_label4 = Label(self.extraction, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        TL_label4.place(relx=0.2, rely=0.36, anchor=E)
+
+        self.TLP_actual = Label(self.extraction, text="{:.1f} V".format(self.actual_voltages['U_TL_plate']), font=font_14, bg = 'grey90', fg = 'black')
+        self.TLP_actual.place(relx=0.4, rely=0.36, anchor=E)
+
+
+        #Top Right Extraction Plate Electrode GUI
+        TR_label1 = Label(self.extraction, text='Top Right Plate', font=font_16, bg = 'grey90', fg = 'black')
+        TR_label1.place(relx=0.75, rely=0.2, anchor=CENTER)
+
+        TR_label2 = Label(self.extraction, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        TR_label2.place(relx=0.67, rely=0.28, anchor=E)
+
+        self.TRP_entry = mySpinbox(self.extraction, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.TRP_entry.delete(0,"end")
+        self.TRP_entry.insert(0,int(round(self.entry_voltages['U_TR_plate'],0)))
+        self.TRP_entry.place(relx=0.67, rely=0.28, anchor=W, width=70)
+        self.TRP_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TR_plate'))
+
+        TR_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        TR_label3.place(relx=0.87, rely=0.28, anchor=CENTER)
+
+        TR_label4 = Label(self.extraction, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        TR_label4.place(relx=0.7, rely=0.36, anchor=E)
+
+        self.TRP_actual = Label(self.extraction, text="{:.1f} V".format(self.actual_voltages['U_TR_plate']), font=font_14, bg = 'grey90', fg = 'black')
+        self.TRP_actual.place(relx=0.9, rely=0.36, anchor=E)
+
+
+        #Bottom Left Extraction Plate Electrode GUI
+        BL_label1 = Label(self.extraction, text='Bottom Left Plate', font=font_16, bg = 'grey90', fg = 'black')
+        BL_label1.place(relx=0.25, rely=0.5, anchor=CENTER)
+
+        BL_label2 = Label(self.extraction, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        BL_label2.place(relx=0.17, rely=0.58, anchor=E)
+
+        self.BLP_entry = mySpinbox(self.extraction, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.BLP_entry.delete(0,"end")
+        self.BLP_entry.insert(0,int(round(self.entry_voltages['U_BL_plate'],0)))
+        self.BLP_entry.place(relx=0.17, rely=0.58, anchor=W, width=70)
+        self.BLP_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BL_plate'))
+
+        BL_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        BL_label3.place(relx=0.37, rely=0.58, anchor=CENTER)
+
+        BL_label4 = Label(self.extraction, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        BL_label4.place(relx=0.2, rely=0.66, anchor=E)
+
+        self.BLP_actual = Label(self.extraction, text="{:.1f} V".format(self.actual_voltages['U_BL_plate']), font=font_14, bg = 'grey90', fg = 'black')
+        self.BLP_actual.place(relx=0.4, rely=0.66, anchor=E)
+
+
+        #Bottom Right Extraction Plate Electrode GUI
+        BR_label1 = Label(self.extraction, text='Bottom Right Plate', font=font_16, bg = 'grey90', fg = 'black')
+        BR_label1.place(relx=0.75, rely=0.5, anchor=CENTER)
+
+        BR_label2 = Label(self.extraction, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        BR_label2.place(relx=0.67, rely=0.58, anchor=E)
+
+        self.BRP_entry = mySpinbox(self.extraction, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.BRP_entry.delete(0,"end")
+        self.BRP_entry.insert(0,int(round(self.entry_voltages['U_BR_plate'],0)))
+        self.BRP_entry.place(relx=0.67, rely=0.58, anchor=W, width=70)
+        self.BRP_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BR_plate'))
+
+        BR_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        BR_label3.place(relx=0.87, rely=0.58, anchor=CENTER)
+
+        BR_label4 = Label(self.extraction, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        BR_label4.place(relx=0.7, rely=0.66, anchor=E)
+
+        self.BRP_actual = Label(self.extraction, text="{:.1f} V".format(self.actual_voltages['U_BR_plate']), font=font_14, bg = 'grey90', fg = 'black')
+        self.BRP_actual.place(relx=0.9, rely=0.66, anchor=E)
+
+
+        #Left Ablation Target Electrode GUI
+        LA_label1 = Label(self.extraction, text='Left Ablation', font=font_16, bg = 'grey90', fg = 'black')
+        LA_label1.place(relx=0.25, rely=0.8, anchor=CENTER)
+
+        LA_label2 = Label(self.extraction, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        LA_label2.place(relx=0.17, rely=0.88, anchor=E)
+
+        self.LA_entry = mySpinbox(self.extraction, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.LA_entry.delete(0,"end")
+        self.LA_entry.insert(0,int(round(self.entry_voltages['U_L_ablation'],0)))
+        self.LA_entry.place(relx=0.17, rely=0.88, anchor=W, width=70)
+        self.LA_entry.bind("<Return>", lambda eff: self.updateEntryV('U_L_ablation'))
+
+        LA_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        LA_label3.place(relx=0.37, rely=0.88, anchor=CENTER)
+
+        LA_label4 = Label(self.extraction, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        LA_label4.place(relx=0.2, rely=0.96, anchor=E)
+
+        self.LA_actual = Label(self.extraction, text="{:.1f} V".format(self.actual_voltages['U_L_ablation']), font=font_14, bg = 'grey90', fg = 'black')
+        self.LA_actual.place(relx=0.4, rely=0.96, anchor=E)
+
+
+        #Right Ablation Target Electrode GUI
+        RA_label1 = Label(self.extraction, text='Right Ablation', font=font_16, bg = 'grey90', fg = 'black')
+        RA_label1.place(relx=0.75, rely=0.8, anchor=CENTER)
+
+        RA_label2 = Label(self.extraction, text='Set:', font=font_14, bg = 'grey90', fg = 'black')
+        RA_label2.place(relx=0.67, rely=0.88, anchor=E)
+
+        self.RA_entry = mySpinbox(self.extraction, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.RA_entry.delete(0,"end")
+        self.RA_entry.insert(0,int(round(self.entry_voltages['U_R_ablation'],0)))
+        self.RA_entry.place(relx=0.67, rely=0.88, anchor=W, width=70)
+        self.RA_entry.bind("<Return>", lambda eff: self.updateEntryV('U_R_ablation'))
+
+        RA_label3 = Label(self.extraction, text='V', font=font_14, bg = 'grey90', fg = 'black')
+        RA_label3.place(relx=0.87, rely=0.88, anchor=CENTER)
+
+        RA_label4 = Label(self.extraction, text='Actual:', font=font_14, bg = 'grey90', fg = 'black')
+        RA_label4.place(relx=0.7, rely=0.96, anchor=E)
+
+        self.RA_actual = Label(self.extraction, text="{:.1f} V".format(self.actual_voltages['U_R_ablation']), font=font_14, bg = 'grey90', fg = 'black')
+        self.RA_actual.place(relx=0.9, rely=0.96, anchor=E)
+    
+
     #Creates the main GUI window
     def makeGui(self, root=None):
         if root == None:
@@ -621,7 +823,9 @@ class Thorium:
 
         self.quad_bender_controls(0.12, 0.22)
 
-        multiThreading(self.data_reader_no_yield)
+        self.extraction_controls(0.4, 0.295)
+
+        #multiThreading(self.data_reader_no_yield)
         #self.connect_no_yield()
         self.root.mainloop()
         #self.reactor.run()          #This line replaces self.root.mainloop() when using Tkinter with Twisted
