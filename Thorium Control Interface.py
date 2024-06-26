@@ -104,58 +104,81 @@ class Thorium:
 
         #Dictionary which will store actual voltages of bender electrodes, as read from server
         #All voltages are initialized as zero upon program start, but will be read by data reader
-        self.actual_voltages = {"U_TR_bender":0, 
-                           "U_TL_bender":0, 
-                           "U_BL_bender":0, 
-                           "U_BR_bender":0, 
-                           "U_TL_plate":0,
-                           "U_TR_plate":0, 
-                           "U_BL_plate":0, 
-                           "U_BR_plate":0, 
-                           "U_L_ablation":0, 
-                           "U_R_ablation":0}
+        self.actual_voltages = {'U_TR_bender':0, 
+                           'U_TL_bender':0, 
+                           'U_BL_bender':0, 
+                           'U_BR_bender':0, 
+                           'U_TL_plate':0,
+                           'U_TR_plate':0, 
+                           'U_BL_plate':0, 
+                           'U_BR_plate':0, 
+                           'U_L_ablation':0, 
+                           'U_R_ablation':0}
         
 
         #Dictionary which will store set voltages of bender electrodes, as specified by user in program
         #All set voltages are initialized as zero upon program start
-        self.set_voltages = {"U_TR_bender":0, 
-                           "U_TL_bender":0, 
-                           "U_BL_bender":0, 
-                           "U_BR_bender":0, 
-                           "U_TL_plate":0,
-                           "U_TR_plate":0, 
-                           "U_BL_plate":0, 
-                           "U_BR_plate":0, 
-                           "U_L_ablation":0, 
-                           "U_R_ablation":0}
+        self.set_voltages = {'U_TR_bender':0, 
+                           'U_TL_bender':0, 
+                           'U_BL_bender':0, 
+                           'U_BR_bender':0, 
+                           'U_TL_plate':0,
+                           'U_TR_plate':0, 
+                           'U_BL_plate':0, 
+                           'U_BR_plate':0, 
+                           'U_L_ablation':0, 
+                           'U_R_ablation':0}
         
 
         #Dictionary which will store voltages that user has typed into entry boxes
         #These are not necessarily the same as set voltages, since power buttons, etc. may be switched
-        self.entry_voltages = {"U_TR_bender":0, 
-                           "U_TL_bender":0, 
-                           "U_BL_bender":0, 
-                           "U_BR_bender":0, 
-                           "U_TL_plate":0,
-                           "U_TR_plate":0, 
-                           "U_BL_plate":0, 
-                           "U_BR_plate":0, 
-                           "U_L_ablation":0, 
-                           "U_R_ablation":0}
+        self.entry_voltages = {'U_TR_bender':0, 
+                           'U_TL_bender':0, 
+                           'U_BL_bender':0, 
+                           'U_BR_bender':0, 
+                           'U_TL_plate':0,
+                           'U_TR_plate':0, 
+                           'U_BL_plate':0, 
+                           'U_BR_plate':0, 
+                           'U_L_ablation':0, 
+                           'U_R_ablation':0}
 
         #Location (server, channel) of electrode voltages on power supplies
-        self.v_location = {"U_TR_bender":("b", 15), 
-                           "U_TL_bender":("b", 12), 
-                           "U_BL_bender":("b", 13), 
-                           "U_BR_bender":("l", 15), 
-                           "U_TL_plate":("l", 14),
-                           "U_TR_plate":("b", 16), 
-                           "U_BL_plate":("l", 16), 
-                           "U_BR_plate":("l", 12), 
-                           "U_L_ablation":("l", 13), 
-                           "U_R_ablation":("b", 14)}
+        self.v_location = {'U_TR_bender':('b', 15), 
+                           'U_TL_bender':('b', 12), 
+                           'U_BL_bender':('b', 13), 
+                           'U_BR_bender':('l', 15), 
+                           'U_TL_plate':('l', 14),
+                           'U_TR_plate':('b', 16), 
+                           'U_BL_plate':('l', 16), 
+                           'U_BR_plate':('l', 12), 
+                           'U_L_ablation':('l', 13), 
+                           'U_R_ablation':('b', 14),        #This is the last line which contains a quadrupole bender electrode
+                           'U_TR1_loading':('b', 2),        #This is the first line which contains a loading trap electrode
+                           'U_TL1_loading':('l', 6),
+                           'U_BL1_loading':('l', 3),
+                           'U_BR1_loading':('l', 10),
+                           'U_TR2_loading':('l', 2),
+                           'U_TL2_loading':('l', 1),
+                           'U_BL2_loading':('l', 8),
+                           'U_BR2_loading':('b', 10),
+                           'U_TR3_loading':('b', 1),
+                           'U_TL3_loading':('b', 4),
+                           'U_BL3_loading':('b', 5),
+                           'U_BR3_loading':('b', 3),
+                           'U_TR4_loading':('b', 11),
+                           'U_TL4_loading':('l', 4),
+                           'U_BL4_loading':('b', 6),
+                           'U_BR4_loading':('l', 11),
+                           'U_TR5_loading':('l', 5),
+                           'U_TL5_loading':('b', 8),
+                           'U_BL5_loading':('l', 9),
+                           'U_BR5_loading':('b', 7),
+                           'U_exit_bender':('b', 9),
+                           'U_exit_loading':('l', 7)}
         
 
+        
         self.U_bender = 0
         
         self.reactor = reactor
@@ -843,7 +866,7 @@ class Thorium:
         try:
             image = Image.open('images/power-button.png')
         except:
-            image = Image.open('C:/Users/Dirac/Downloads/Thorium-Control-Interface-main/images/power-button.png')
+            image = Image.open('C:/Users/Dirac/code/thorium\control/clients/Thorium-Control-Interface-main/images/power-button.png')
         image = image.resize((30,32))
         self.power_button = ImageTk.PhotoImage(image)
 
