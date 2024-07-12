@@ -1,6 +1,6 @@
 #Thorium Control Interface
 #Author: Richard Mattish
-#Last Updated: 07/11/2024
+#Last Updated: 07/12/2024
 
 
 #Function:  This program provides a graphical user interface for setting
@@ -445,6 +445,11 @@ class Thorium:
             self.RA_entry.delete(0, END)
             self.RA_entry.insert(0, int(round(self.entry_voltages[name],0)))
 
+        elif name == 'U_segment_1':
+            self.U_segment_1 = float(self.U_segment_1_entry.get())
+            self.U_segment_1_entry.delete(0, END)
+            self.U_segment_1_entry.insert(0, int(round(self.U_segment_1,0)))
+
         elif name == 'U_TR1_loading':
             self.entry_voltages[name] = float(self.TR1_entry.get())
             self.TR1_entry.delete(0, END)
@@ -464,6 +469,11 @@ class Thorium:
             self.entry_voltages[name] = float(self.BR1_entry.get())
             self.BR1_entry.delete(0, END)
             self.BR1_entry.insert(0, int(round(self.entry_voltages[name],0)))
+
+        elif name == 'U_segment_2':
+            self.U_segment_2 = float(self.U_segment_2_entry.get())
+            self.U_segment_2_entry.delete(0, END)
+            self.U_segment_2_entry.insert(0, int(round(self.U_segment_2,0)))
         
         elif name == 'U_TR2_loading':
             self.entry_voltages[name] = float(self.TR2_entry.get())
@@ -485,6 +495,11 @@ class Thorium:
             self.BR2_entry.delete(0, END)
             self.BR2_entry.insert(0, int(round(self.entry_voltages[name],0)))
 
+        elif name == 'U_segment_3':
+            self.U_segment_3 = float(self.U_segment_3_entry.get())
+            self.U_segment_3_entry.delete(0, END)
+            self.U_segment_3_entry.insert(0, int(round(self.U_segment_3,0)))
+
         elif name == 'U_TR3_loading':
             self.entry_voltages[name] = float(self.TR3_entry.get())
             self.TR3_entry.delete(0, END)
@@ -505,6 +520,11 @@ class Thorium:
             self.BL3_entry.delete(0, END)
             self.BL3_entry.insert(0, int(round(self.entry_voltages[name],0)))
 
+        elif name == 'U_segment_4':
+            self.U_segment_4 = float(self.U_segment_4_entry.get())
+            self.U_segment_4_entry.delete(0, END)
+            self.U_segment_4_entry.insert(0, int(round(self.U_segment_4,0)))
+
         elif name == 'U_TR4_loading':
             self.entry_voltages[name] = float(self.TR4_entry.get())
             self.TR4_entry.delete(0, END)
@@ -524,6 +544,11 @@ class Thorium:
             self.entry_voltages[name] = float(self.BL4_entry.get())
             self.BL4_entry.delete(0, END)
             self.BL4_entry.insert(0, int(round(self.entry_voltages[name],0)))
+
+        elif name == 'U_segment_5':
+            self.U_segment_5 = float(self.U_segment_5_entry.get())
+            self.U_segment_5_entry.delete(0, END)
+            self.U_segment_5_entry.insert(0, int(round(self.U_segment_5,0)))
 
         elif name == 'U_TR5_loading':
             self.entry_voltages[name] = float(self.TR5_entry.get())
@@ -577,7 +602,7 @@ class Thorium:
         else:
             for name in extraction_names:
                 self.set_voltages[name] = 0
-
+        
         # Segment 1 button logic
         if self.U_segment_1_bool:
             if self.segment_1_mode_bool:
@@ -1542,12 +1567,12 @@ class Thorium:
         U_segment_4_label3 = Label(self.segment_4, text='=', font=font_14, bg = 'grey90', fg = 'black')
         U_segment_4_label3.place(relx=0.31, rely=0.2, anchor=E)
 
-        U_segment_4_entry = Entry(self.segment_4, font=font_14, justify=RIGHT)
-        U_segment_4_entry.delete(0, "end")
-        U_segment_4_entry.insert(0, int(round(self.U_segment_4, 0)))
-        U_segment_4_entry.place(relx=0.31, rely=0.2, anchor=W, width=70)
-        U_segment_4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_segment_4'))
-        U_segment_4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_segment_4'))
+        self.U_segment_4_entry = Entry(self.segment_4, font=font_14, justify=RIGHT)
+        self.U_segment_4_entry.delete(0, "end")
+        self.U_segment_4_entry.insert(0, int(round(self.U_segment_4, 0)))
+        self.U_segment_4_entry.place(relx=0.31, rely=0.2, anchor=W, width=70)
+        self.U_segment_4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_segment_4'))
+        self.U_segment_4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_segment_4'))
 
         U_segment_4_label4 = Label(self.segment_4, text='V', font=font_14, bg='grey90', fg='black')
         U_segment_4_label4.place(relx=0.51, rely=0.2, anchor=CENTER)
@@ -1565,12 +1590,12 @@ class Thorium:
         TL4_label2 = Label(self.segment_4, text='Set:', font=font_14, bg='grey90', fg='black')
         TL4_label2.place(relx=0.17, rely=0.5, anchor=E)
 
-        TL4_entry = mySpinbox(self.segment_4, from_=-500, to=500, font=font_14, justify=RIGHT)
-        TL4_entry.delete(0, "end")
-        TL4_entry.insert(0, int(round(self.entry_voltages['U_TL4_loading'], 0)))
-        TL4_entry.place(relx=0.17, rely=0.5, anchor=W, width=70)
-        TL4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TL4_loading'))
-        TL4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TL4_loading'))
+        self.TL4_entry = mySpinbox(self.segment_4, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.TL4_entry.delete(0, "end")
+        self.TL4_entry.insert(0, int(round(self.entry_voltages['U_TL4_loading'], 0)))
+        self.TL4_entry.place(relx=0.17, rely=0.5, anchor=W, width=70)
+        self.TL4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TL4_loading'))
+        self.TL4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TL4_loading'))
 
         TL4_label3 = Label(self.segment_4, text='V', font=font_14, bg='grey90', fg='black')
         TL4_label3.place(relx=0.37, rely=0.5, anchor=CENTER)
@@ -1578,9 +1603,9 @@ class Thorium:
         TL4_label4 = Label(self.segment_4, text='Actual:', font=font_14, bg='grey90', fg='black')
         TL4_label4.place(relx=0.2, rely=0.6, anchor=E)
 
-        TL4_actual = Label(self.segment_4, text="{:.1f} V".format(self.actual_voltages['U_TL4_loading']),
+        self.TL4_actual = Label(self.segment_4, text="{:.1f} V".format(self.actual_voltages['U_TL4_loading']),
                    font=font_14, bg='grey90', fg='black')
-        TL4_actual.place(relx=0.4, rely=0.6, anchor=E)
+        self.TL4_actual.place(relx=0.4, rely=0.6, anchor=E)
 
         # Top Right Loading Electrode GUI
         TR4_label1 = Label(self.segment_4, text='Top Right', font=font_16, bg='grey90', fg='black')
@@ -1589,12 +1614,12 @@ class Thorium:
         TR4_label2 = Label(self.segment_4, text='Set:', font=font_14, bg='grey90', fg='black')
         TR4_label2.place(relx=0.67, rely=0.5, anchor=E)
 
-        TR4_entry = mySpinbox(self.segment_4, from_=-500, to=500, font=font_14, justify=RIGHT)
-        TR4_entry.delete(0, "end")
-        TR4_entry.insert(0, int(round(self.entry_voltages['U_TR4_loading'], 0)))
-        TR4_entry.place(relx=0.67, rely=0.5, anchor=W, width=70)
-        TR4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TR4_loading'))
-        TR4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TR4_loading'))
+        self.TR4_entry = mySpinbox(self.segment_4, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.TR4_entry.delete(0, "end")
+        self.TR4_entry.insert(0, int(round(self.entry_voltages['U_TR4_loading'], 0)))
+        self.TR4_entry.place(relx=0.67, rely=0.5, anchor=W, width=70)
+        self.TR4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TR4_loading'))
+        self.TR4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TR4_loading'))
 
         TR4_label3 = Label(self.segment_4, text='V', font=font_14, bg='grey90', fg='black')
         TR4_label3.place(relx=0.87, rely=0.5, anchor=CENTER)
@@ -1602,9 +1627,9 @@ class Thorium:
         TR4_label4 = Label(self.segment_4, text='Actual:', font=font_14, bg='grey90', fg='black')
         TR4_label4.place(relx=0.7, rely=0.6, anchor=E)
 
-        TR4_actual = Label(self.segment_4, text="{:.1f} V".format(self.actual_voltages['U_TR4_loading']),
+        self.TR4_actual = Label(self.segment_4, text="{:.1f} V".format(self.actual_voltages['U_TR4_loading']),
                    font=font_14, bg='grey90', fg='black')
-        TR4_actual.place(relx=0.9, rely=0.6, anchor=E)
+        self.TR4_actual.place(relx=0.9, rely=0.6, anchor=E)
 
         # Bottom Left Loading Electrode GUI
         BL4_label1 = Label(self.segment_4, text='Bottom Left', font=font_16, bg='grey90', fg='black')
@@ -1613,12 +1638,12 @@ class Thorium:
         BL4_label2 = Label(self.segment_4, text='Set:', font=font_14, bg='grey90', fg='black')
         BL4_label2.place(relx=0.17, rely=0.85, anchor=E)
 
-        BL4_entry = mySpinbox(self.segment_4, from_=-500, to=500, font=font_14, justify=RIGHT)
-        BL4_entry.delete(0, "end")
-        BL4_entry.insert(0, int(round(self.entry_voltages['U_BL4_loading'], 0)))
-        BL4_entry.place(relx=0.17, rely=0.85, anchor=W, width=70)
-        BL4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BL4_loading'))
-        BL4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BL4_loading'))
+        self.BL4_entry = mySpinbox(self.segment_4, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.BL4_entry.delete(0, "end")
+        self.BL4_entry.insert(0, int(round(self.entry_voltages['U_BL4_loading'], 0)))
+        self.BL4_entry.place(relx=0.17, rely=0.85, anchor=W, width=70)
+        self.BL4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BL4_loading'))
+        self.BL4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BL4_loading'))
 
         BL4_label3 = Label(self.segment_4, text='V', font=font_14, bg='grey90', fg='black')
         BL4_label3.place(relx=0.37, rely=0.85, anchor=CENTER)
@@ -1626,9 +1651,9 @@ class Thorium:
         BL4_label4 = Label(self.segment_4, text='Actual:', font=font_14, bg='grey90', fg='black')
         BL4_label4.place(relx=0.2, rely=0.95, anchor=E)
 
-        BL4_actual = Label(self.segment_4, text="{:.1f} V".format(self.actual_voltages['U_BL4_loading']),
+        self.BL4_actual = Label(self.segment_4, text="{:.1f} V".format(self.actual_voltages['U_BL4_loading']),
                    font=font_14, bg='grey90', fg='black')
-        BL4_actual.place(relx=0.4, rely=0.95, anchor=E)
+        self.BL4_actual.place(relx=0.4, rely=0.95, anchor=E)
 
         # Bottom Right Loading Electrode GUI
         BR4_label1 = Label(self.segment_4, text='Bottom Right', font=font_16, bg='grey90', fg='black')
@@ -1637,12 +1662,12 @@ class Thorium:
         BR4_label2 = Label(self.segment_4, text='Set:', font=font_14, bg='grey90', fg='black')
         BR4_label2.place(relx=0.67, rely=0.85, anchor=E)
 
-        BR4_entry = mySpinbox(self.segment_4, from_=-500, to=500, font=font_14, justify=RIGHT)
-        BR4_entry.delete(0, "end")
-        BR4_entry.insert(0, int(round(self.entry_voltages['U_BR4_loading'], 0)))
-        BR4_entry.place(relx=0.67, rely=0.85, anchor=W, width=70)
-        BR4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BR4_loading'))
-        BR4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BR4_loading'))
+        self.BR4_entry = mySpinbox(self.segment_4, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.BR4_entry.delete(0, "end")
+        self.BR4_entry.insert(0, int(round(self.entry_voltages['U_BR4_loading'], 0)))
+        self.BR4_entry.place(relx=0.67, rely=0.85, anchor=W, width=70)
+        self.BR4_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BR4_loading'))
+        self.BR4_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BR4_loading'))
 
         BR4_label3 = Label(self.segment_4, text='V', font=font_14, bg='grey90', fg='black')
         BR4_label3.place(relx=0.87, rely=0.85, anchor=CENTER)
@@ -1650,9 +1675,9 @@ class Thorium:
         BR4_label4 = Label(self.segment_4, text='Actual:', font=font_14, bg='grey90', fg='black')
         BR4_label4.place(relx=0.7, rely=0.95, anchor=E)
 
-        BR4_actual = Label(self.segment_4, text="{:.1f} V".format(self.actual_voltages['U_BR4_loading']),
+        self.BR4_actual = Label(self.segment_4, text="{:.1f} V".format(self.actual_voltages['U_BR4_loading']),
                    font=font_14, bg='grey90', fg='black')
-        BR4_actual.place(relx=0.9, rely=0.95, anchor=E)
+        self.BR4_actual.place(relx=0.9, rely=0.95, anchor=E)
 
 
     def segment_5_controls(self, x, y):    
@@ -1681,12 +1706,12 @@ class Thorium:
         U_segment_5_label3 = Label(self.segment_5, text='=', font=font_14, bg = 'grey90', fg = 'black')
         U_segment_5_label3.place(relx=0.31, rely=0.2, anchor=E)
 
-        U_segment_5_entry = Entry(self.segment_5, font=font_14, justify=RIGHT)
-        U_segment_5_entry.delete(0, "end")
-        U_segment_5_entry.insert(0, int(round(self.U_segment_5, 0)))
-        U_segment_5_entry.place(relx=0.31, rely=0.2, anchor=W, width=70)
-        U_segment_5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_segment_5'))
-        U_segment_5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_segment_5'))
+        self.U_segment_5_entry = Entry(self.segment_5, font=font_14, justify=RIGHT)
+        self.U_segment_5_entry.delete(0, "end")
+        self.U_segment_5_entry.insert(0, int(round(self.U_segment_5, 0)))
+        self.U_segment_5_entry.place(relx=0.31, rely=0.2, anchor=W, width=70)
+        self.U_segment_5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_segment_5'))
+        self.U_segment_5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_segment_5'))
 
         U_segment_5_label4 = Label(self.segment_5, text='V', font=font_14, bg='grey90', fg='black')
         U_segment_5_label4.place(relx=0.51, rely=0.2, anchor=CENTER)
@@ -1704,12 +1729,12 @@ class Thorium:
         TL5_label2 = Label(self.segment_5, text='Set:', font=font_14, bg='grey90', fg='black')
         TL5_label2.place(relx=0.17, rely=0.5, anchor=E)
 
-        TL5_entry = mySpinbox(self.segment_5, from_=-500, to=500, font=font_14, justify=RIGHT)
-        TL5_entry.delete(0, "end")
-        TL5_entry.insert(0, int(round(self.entry_voltages['U_TL5_loading'], 0)))
-        TL5_entry.place(relx=0.17, rely=0.5, anchor=W, width=70)
-        TL5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TL5_loading'))
-        TL5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TL5_loading'))
+        self.TL5_entry = mySpinbox(self.segment_5, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.TL5_entry.delete(0, "end")
+        self.TL5_entry.insert(0, int(round(self.entry_voltages['U_TL5_loading'], 0)))
+        self.TL5_entry.place(relx=0.17, rely=0.5, anchor=W, width=70)
+        self.TL5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TL5_loading'))
+        self.TL5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TL5_loading'))
 
         TL5_label3 = Label(self.segment_5, text='V', font=font_14, bg='grey90', fg='black')
         TL5_label3.place(relx=0.37, rely=0.5, anchor=CENTER)
@@ -1717,9 +1742,9 @@ class Thorium:
         TL5_label4 = Label(self.segment_5, text='Actual:', font=font_14, bg='grey90', fg='black')
         TL5_label4.place(relx=0.2, rely=0.6, anchor=E)
 
-        TL5_actual = Label(self.segment_5, text="{:.1f} V".format(self.actual_voltages['U_TL5_loading']),
+        self.TL5_actual = Label(self.segment_5, text="{:.1f} V".format(self.actual_voltages['U_TL5_loading']),
                font=font_14, bg='grey90', fg='black')
-        TL5_actual.place(relx=0.4, rely=0.6, anchor=E)
+        self.TL5_actual.place(relx=0.4, rely=0.6, anchor=E)
 
         # Top Right Loading Electrode GUI
         TR5_label1 = Label(self.segment_5, text='Top Right', font=font_16, bg='grey90', fg='black')
@@ -1728,12 +1753,12 @@ class Thorium:
         TR5_label2 = Label(self.segment_5, text='Set:', font=font_14, bg='grey90', fg='black')
         TR5_label2.place(relx=0.67, rely=0.5, anchor=E)
 
-        TR5_entry = mySpinbox(self.segment_5, from_=-500, to=500, font=font_14, justify=RIGHT)
-        TR5_entry.delete(0, "end")
-        TR5_entry.insert(0, int(round(self.entry_voltages['U_TR5_loading'], 0)))
-        TR5_entry.place(relx=0.67, rely=0.5, anchor=W, width=70)
-        TR5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TR5_loading'))
-        TR5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TR5_loading'))
+        self.TR5_entry = mySpinbox(self.segment_5, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.TR5_entry.delete(0, "end")
+        self.TR5_entry.insert(0, int(round(self.entry_voltages['U_TR5_loading'], 0)))
+        self.TR5_entry.place(relx=0.67, rely=0.5, anchor=W, width=70)
+        self.TR5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_TR5_loading'))
+        self.TR5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_TR5_loading'))
 
         TR5_label3 = Label(self.segment_5, text='V', font=font_14, bg='grey90', fg='black')
         TR5_label3.place(relx=0.87, rely=0.5, anchor=CENTER)
@@ -1741,9 +1766,9 @@ class Thorium:
         TR5_label4 = Label(self.segment_5, text='Actual:', font=font_14, bg='grey90', fg='black')
         TR5_label4.place(relx=0.7, rely=0.6, anchor=E)
 
-        TR5_actual = Label(self.segment_5, text="{:.1f} V".format(self.actual_voltages['U_TR5_loading']),
+        self.TR5_actual = Label(self.segment_5, text="{:.1f} V".format(self.actual_voltages['U_TR5_loading']),
                font=font_14, bg='grey90', fg='black')
-        TR5_actual.place(relx=0.9, rely=0.6, anchor=E)
+        self.TR5_actual.place(relx=0.9, rely=0.6, anchor=E)
 
         # Bottom Left Loading Electrode GUI
         BL5_label1 = Label(self.segment_5, text='Bottom Left', font=font_16, bg='grey90', fg='black')
@@ -1752,12 +1777,12 @@ class Thorium:
         BL5_label2 = Label(self.segment_5, text='Set:', font=font_14, bg='grey90', fg='black')
         BL5_label2.place(relx=0.17, rely=0.85, anchor=E)
 
-        BL5_entry = mySpinbox(self.segment_5, from_=-500, to=500, font=font_14, justify=RIGHT)
-        BL5_entry.delete(0, "end")
-        BL5_entry.insert(0, int(round(self.entry_voltages['U_BL5_loading'], 0)))
-        BL5_entry.place(relx=0.17, rely=0.85, anchor=W, width=70)
-        BL5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BL5_loading'))
-        BL5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BL5_loading'))
+        self.BL5_entry = mySpinbox(self.segment_5, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.BL5_entry.delete(0, "end")
+        self.BL5_entry.insert(0, int(round(self.entry_voltages['U_BL5_loading'], 0)))
+        self.BL5_entry.place(relx=0.17, rely=0.85, anchor=W, width=70)
+        self.BL5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BL5_loading'))
+        self.BL5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BL5_loading'))
 
         BL5_label3 = Label(self.segment_5, text='V', font=font_14, bg='grey90', fg='black')
         BL5_label3.place(relx=0.37, rely=0.85, anchor=CENTER)
@@ -1765,9 +1790,9 @@ class Thorium:
         BL5_label4 = Label(self.segment_5, text='Actual:', font=font_14, bg='grey90', fg='black')
         BL5_label4.place(relx=0.2, rely=0.95, anchor=E)
 
-        BL5_actual = Label(self.segment_5, text="{:.1f} V".format(self.actual_voltages['U_BL5_loading']),
+        self.BL5_actual = Label(self.segment_5, text="{:.1f} V".format(self.actual_voltages['U_BL5_loading']),
                font=font_14, bg='grey90', fg='black')
-        BL5_actual.place(relx=0.4, rely=0.95, anchor=E)
+        self.BL5_actual.place(relx=0.4, rely=0.95, anchor=E)
 
         # Bottom Right Loading Electrode GUI
         BR5_label1 = Label(self.segment_5, text='Bottom Right', font=font_16, bg='grey90', fg='black')
@@ -1776,12 +1801,12 @@ class Thorium:
         BR5_label2 = Label(self.segment_5, text='Set:', font=font_14, bg='grey90', fg='black')
         BR5_label2.place(relx=0.67, rely=0.85, anchor=E)
 
-        BR5_entry = mySpinbox(self.segment_5, from_=-500, to=500, font=font_14, justify=RIGHT)
-        BR5_entry.delete(0, "end")
-        BR5_entry.insert(0, int(round(self.entry_voltages['U_BR5_loading'], 0)))
-        BR5_entry.place(relx=0.67, rely=0.85, anchor=W, width=70)
-        BR5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BR5_loading'))
-        BR5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BR5_loading'))
+        self.BR5_entry = mySpinbox(self.segment_5, from_=-500, to=500, font=font_14, justify=RIGHT)
+        self.BR5_entry.delete(0, "end")
+        self.BR5_entry.insert(0, int(round(self.entry_voltages['U_BR5_loading'], 0)))
+        self.BR5_entry.place(relx=0.67, rely=0.85, anchor=W, width=70)
+        self.BR5_entry.bind("<Return>", lambda eff: self.updateEntryV('U_BR5_loading'))
+        self.BR5_entry.bind("<Tab>", lambda eff: self.updateEntryV('U_BR5_loading'))
 
         BR5_label3 = Label(self.segment_5, text='V', font=font_14, bg='grey90', fg='black')
         BR5_label3.place(relx=0.87, rely=0.85, anchor=CENTER)
@@ -1789,9 +1814,9 @@ class Thorium:
         BR5_label4 = Label(self.segment_5, text='Actual:', font=font_14, bg='grey90', fg='black')
         BR5_label4.place(relx=0.7, rely=0.95, anchor=E)
 
-        BR5_actual = Label(self.segment_5, text="{:.1f} V".format(self.actual_voltages['U_BR5_loading']),
+        self.BR5_actual = Label(self.segment_5, text="{:.1f} V".format(self.actual_voltages['U_BR5_loading']),
                font=font_14, bg='grey90', fg='black')
-        BR5_actual.place(relx=0.9, rely=0.95, anchor=E)
+        self.BR5_actual.place(relx=0.9, rely=0.95, anchor=E)
 
     #Creates the main GUI window
     def makeGui(self, root=None):
@@ -1830,18 +1855,14 @@ class Thorium:
         self.extraction_controls(0.15, 0.295)
 
         self.segment_1_controls(0.15, 0.245)
-
         self.segment_2_controls(0.4, 0.245)
-
         self.segment_3_controls(0.65, 0.245)
-
         self.segment_4_controls(0.15, 0.65)
-
         self.segment_5_controls(0.4, 0.65)
 
 
 
-        #multiThreading(self.data_reader_no_yield)
+        multiThreading(self.data_reader_no_yield)
         #self.connect_no_yield()
         self.root.mainloop()
         #self.reactor.run()          #This line replaces self.root.mainloop() when using Tkinter with Twisted
