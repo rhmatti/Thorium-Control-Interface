@@ -1838,7 +1838,7 @@ class Thorium:
                 self.root.iconbitmap("icons/TCI.ico")
             except TclError:
                 print('Program started remotely by another program...')
-                print('No icons will be used')
+                self.root.iconbitmap("C:/Users/Dirac/code/thorium\control/clients/Thorium-Control-Interface-main/icons/TCI.ico")
 
         try:
             image = Image.open('images/power-button.png')
