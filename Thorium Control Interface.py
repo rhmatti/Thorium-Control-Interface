@@ -117,8 +117,7 @@ class Thorium:
                            'U_TL5_loading':0,
                            'U_BL5_loading':0,
                            'U_BR5_loading':0,
-                           'U_exit_bender':0,
-                           'U_exit_loading':0}
+                           'U_exit_bender':0}
         
 
         #Dictionary which will store set voltages of bender electrodes, as specified by user in program
@@ -130,38 +129,37 @@ class Thorium:
         self.entry_voltages = self.actual_voltages.copy()
 
         #Location (server, channel) of electrode voltages on power supplies
-        self.v_location = {'U_TR_bender':('b', 15), 
+        self.v_location = {'U_TR_bender':('b', 11), 
                            'U_TL_bender':('b', 12), 
                            'U_BL_bender':('b', 13), 
-                           'U_BR_bender':('l', 15), 
-                           'U_TL_plate':('l', 14),
-                           'U_TR_plate':('b', 16), 
-                           'U_BL_plate':('l', 16), 
-                           'U_BR_plate':('l', 12), 
-                           'U_L_ablation':('l', 13), 
-                           'U_R_ablation':('b', 14),        #This is the last line which contains a quadrupole bender electrode
-                           'U_TR1_loading':('b', 2),        #This is the first line which contains a loading trap electrode
-                           'U_TL1_loading':('l', 6),
-                           'U_BL1_loading':('l', 3),
-                           'U_BR1_loading':('l', 10),
-                           'U_TR2_loading':('l', 2),
-                           'U_TL2_loading':('l', 1),
-                           'U_BL2_loading':('l', 8),
-                           'U_BR2_loading':('b', 10),
-                           'U_TR3_loading':('b', 1),
-                           'U_TL3_loading':('b', 4),
-                           'U_BL3_loading':('b', 5),
-                           'U_BR3_loading':('b', 3),
-                           'U_TR4_loading':('b', 11),
-                           'U_TL4_loading':('l', 4),
-                           'U_BL4_loading':('b', 6),
-                           'U_BR4_loading':('l', 11),
-                           'U_TR5_loading':('l', 5),
-                           'U_TL5_loading':('b', 8),
-                           'U_BL5_loading':('l', 9),
-                           'U_BR5_loading':('b', 7),
-                           'U_exit_bender':('b', 9),
-                           'U_exit_loading':('l', 7)}
+                           'U_BR_bender':('b', 14), 
+                           'U_TL_plate':('b', 7),
+                           'U_TR_plate':('b', 10), 
+                           'U_BL_plate':('b', 6), 
+                           'U_BR_plate':('b', 9), 
+                           'U_L_ablation':('b', 5), 
+                           'U_R_ablation':('b', 8),        #This is the last line which contains a quadrupole bender electrode
+                           'U_TR1_loading':('l', 10),      #This is the first line which contains a loading trap electrode
+                           'U_TL1_loading':('l', 5),
+                           'U_BL1_loading':('l', 15),
+                           'U_BR1_loading':('b', 4),
+                           'U_TR2_loading':('l', 9),
+                           'U_TL2_loading':('l', 4),
+                           'U_BL2_loading':('l', 14),
+                           'U_BR2_loading':('b', 3),
+                           'U_TR3_loading':('l', 8),
+                           'U_TL3_loading':('l', 3),
+                           'U_BL3_loading':('l', 13),
+                           'U_BR3_loading':('b', 2),
+                           'U_TR4_loading':('l', 7),
+                           'U_TL4_loading':('l', 2),
+                           'U_BL4_loading':('l', 12),
+                           'U_BR4_loading':('b', 1),
+                           'U_TR5_loading':('l', 6),
+                           'U_TL5_loading':('l', 1),
+                           'U_BL5_loading':('l', 11),
+                           'U_BR5_loading':('l', 16),
+                           'U_exit_bender':('b', 15)}
         
 
         
@@ -230,6 +228,23 @@ class Thorium:
         self.loading_server = self.cxn.hv500_loading_server
 
 
+    def getVoltages(self):
+        try:
+            bender_v = self.bender_server.get_all_voltages()
+            loading_v = self.loading_server.get_all_voltages()
+
+            for name, entry in self.v_location.items():
+                if entry[0] == 'b':
+                    self.actual_voltages[name] = bender_v[entry[1]-1]
+                elif entry[0] == 'l':
+                    self.actual_voltages[name] = loading_v[entry[1]-1]
+        except:
+            print('Error getting voltages')
+
+        
+                
+            
+
 
     def getVoltage(self, name):
         supply = self.v_location[name][0]
@@ -276,22 +291,27 @@ class Thorium:
     # It reads values of all power supply voltages and updates them in the display
     def data_reader_no_yield(self):
 
+        # Establishes connection to the LabRad server
         self.connect_no_yield()
 
+        # Reads existing voltages and updates the set and entry voltages accordingly upon first time booting software
+        self.getVoltages()
+        self.set_voltages = self.actual_voltages.copy()
+        self.entry_voltages = self.actual_voltages.copy()
+
+        # Continuously loops to both read the voltage values from the supplies and also to update those values if the user has entered a new one
         while True:
             self.updateSetV()
+            self.getVoltages()
+
 
             for v in self.v_location:
-                self.actual_voltages[v] = self.getVoltage(v)
-
-                print(f'{v} = {self.actual_voltages[v]}')
-
                 if abs(self.actual_voltages[v] - self.set_voltages[v]) > 0.2:
                     self.setVoltage(v)
 
                 self.updateActualV(v)
         
-            time.sleep(0.1)
+            time.sleep(0.5)
 
 
     # This function updates the actual voltage labels in the GUI
@@ -1866,6 +1886,8 @@ class Thorium:
         #self.connect_no_yield()
         self.root.mainloop()
         #self.reactor.run()          #This line replaces self.root.mainloop() when using Tkinter with Twisted
+
+        
 
 
 # if __name__ == '__main__':
