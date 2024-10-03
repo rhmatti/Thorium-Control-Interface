@@ -130,38 +130,38 @@ class Thorium:
         self.entry_voltages = self.actual_voltages.copy()
 
         #Location (server, channel) of electrode voltages on power supplies
-        self.v_location = {'U_TR_bender':('b', 11), 
-                           'U_TL_bender':('b', 12), 
-                           'U_BL_bender':('b', 13), 
-                           'U_BR_bender':('b', 14), 
-                           'U_TL_plate':('b', 7),
-                           'U_TR_plate':('b', 10), 
-                           'U_BL_plate':('b', 6), 
-                           'U_BR_plate':('b', 9), 
-                           'U_L_ablation':('b', 5), 
-                           'U_R_ablation':('b', 8),        #This is the last line which contains a quadrupole bender electrode
-                           'U_TR1_loading':('l', 10),      #This is the first line which contains a loading trap electrode
-                           'U_TL1_loading':('l', 5),
-                           'U_BL1_loading':('l', 15),
-                           'U_BR1_loading':('b', 4),
-                           'U_TR2_loading':('l', 9),
-                           'U_TL2_loading':('l', 4),
-                           'U_BL2_loading':('l', 14),
-                           'U_BR2_loading':('b', 3),
-                           'U_TR3_loading':('l', 8),
-                           'U_TL3_loading':('l', 3),
-                           'U_BL3_loading':('l', 13),
-                           'U_BR3_loading':('b', 2),
-                           'U_TR4_loading':('l', 7),
-                           'U_TL4_loading':('l', 2),
-                           'U_BL4_loading':('l', 12),
-                           'U_BR4_loading':('b', 1),
-                           'U_TR5_loading':('l', 6),
-                           'U_TL5_loading':('l', 1),
-                           'U_BL5_loading':('l', 11),
-                           'U_BR5_loading':('l', 16),
-                           'U_exit_bender':('b', 15),
-                           'U_exit_loading':('l', 20)}
+        self.v_location = {'U_TR_bender':(2, 11), 
+                           'U_TL_bender':(2, 12), 
+                           'U_BL_bender':(2, 13), 
+                           'U_BR_bender':(2, 14), 
+                           'U_TL_plate':(2, 7),
+                           'U_TR_plate':(2, 10), 
+                           'U_BL_plate':(2, 6), 
+                           'U_BR_plate':(2, 9), 
+                           'U_L_ablation':(2, 5), 
+                           'U_R_ablation':(2, 8),        #This is the last line which contains a quadrupole bender electrode
+                           'U_TR1_loading':(1, 10),      #This is the first line which contains a loading trap electrode
+                           'U_TL1_loading':(1, 5),
+                           'U_BL1_loading':(1, 15),
+                           'U_BR1_loading':(2, 4),
+                           'U_TR2_loading':(1, 9),
+                           'U_TL2_loading':(1, 4),
+                           'U_BL2_loading':(1, 14),
+                           'U_BR2_loading':(2, 3),
+                           'U_TR3_loading':(1, 8),
+                           'U_TL3_loading':(1, 3),
+                           'U_BL3_loading':(1, 13),
+                           'U_BR3_loading':(2, 2),
+                           'U_TR4_loading':(1, 7),
+                           'U_TL4_loading':(1, 2),
+                           'U_BL4_loading':(1, 12),
+                           'U_BR4_loading':(2, 1),
+                           'U_TR5_loading':(1, 6),
+                           'U_TL5_loading':(1, 1),
+                           'U_BL5_loading':(1, 11),
+                           'U_BR5_loading':(1, 16),
+                           'U_exit_bender':(2, 15),
+                           'U_exit_loading':(1, 20)}
         
 
         
@@ -243,9 +243,9 @@ class Thorium:
             loading_v = self.loading_server.get_all_voltages()
 
             for name, entry in self.v_location.items():
-                if entry[0] == 'b':
+                if entry[0] == 2:
                     self.actual_voltages[name] = bender_v[entry[1]-1]
-                elif entry[0] == 'l':
+                elif entry[0] == 1:
                     self.actual_voltages[name] = loading_v[entry[1]-1]
         except:
             print('Error getting voltages')
@@ -258,9 +258,9 @@ class Thorium:
     def getVoltage(self, name):
         supply = self.v_location[name][0]
         channel = self.v_location[name][1]
-        if supply == 'b':
+        if supply == 2:
             voltage = self.bender_server.get_voltage(channel)
-        elif supply == 'l':
+        elif supply == 1:
             voltage = self.loading_server.get_voltage(channel)
         return voltage
     
@@ -268,9 +268,9 @@ class Thorium:
     def setVoltage(self, name):
         supply = self.v_location[name][0]
         channel = self.v_location[name][1]
-        if supply == 'b':
+        if supply == 2:
             self.bender_server.set_voltage(channel, self.set_voltages[name])
-        elif supply == 'l':
+        elif supply == 1:
             self.loading_server.set_voltage(channel, self.set_voltages[name])
 
 
@@ -282,9 +282,9 @@ class Thorium:
     #         for v in self.v_location:
     #             supply = self.v_location[v][0]
     #             channel = self.v_location[v][1]
-    #             if supply == 'b':
+    #             if supply == 2:
     #                 voltage = yield self.bender_server.get_voltage(channel)
-    #             elif supply == 'l':
+    #             elif supply == 1:
     #                 voltage = yield self.loading_server.get_voltage(channel)
 
 
