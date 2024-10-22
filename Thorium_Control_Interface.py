@@ -623,6 +623,132 @@ class Thorium():
             self.U_exit_loading_entry.delete(0, END)
             self.U_exit_loading_entry.insert(0, int(round(self.entry_voltages[name],0)))
 
+    def populateEntryV(self):
+        self.U_bender_entry.delete(0, END)
+        self.U_bender_entry.insert(0, int(round(self.U_bender,0)))
+
+        self.TL_entry.delete(0, END)
+        self.TL_entry.insert(0, int(round(self.entry_voltages['U_TL_bender'],0)))
+
+        self.TR_entry.delete(0, END)
+        self.TR_entry.insert(0, int(round(self.entry_voltages['U_TR_bender'],0)))
+
+        self.BL_entry.delete(0, END)
+        self.BL_entry.insert(0, int(round(self.entry_voltages['U_BL_bender'],0)))
+
+        self.BR_entry.delete(0, END)
+        self.BR_entry.insert(0, int(round(self.entry_voltages['U_BR_bender'],0)))
+
+        self.TLP_entry.delete(0, END)
+        self.TLP_entry.insert(0, int(round(self.entry_voltages['U_TL_plate'],0)))
+
+        self.TRP_entry.delete(0, END)
+        self.TRP_entry.insert(0, int(round(self.entry_voltages['U_TR_plate'],0)))
+
+        self.BLP_entry.delete(0, END)
+        self.BLP_entry.insert(0, int(round(self.entry_voltages['U_BL_plate'],0)))
+
+        self.BRP_entry.delete(0, END)
+        self.BRP_entry.insert(0, int(round(self.entry_voltages['U_BR_plate'],0)))
+
+        self.LA_entry.delete(0, END)
+        self.LA_entry.insert(0, int(round(self.entry_voltages['U_L_ablation'],0)))
+
+        self.RA_entry.delete(0, END)
+        self.RA_entry.insert(0, int(round(self.entry_voltages['U_R_ablation'],0)))
+
+        self.U_segment_1_entry.delete(0, END)
+        self.U_segment_1_entry.insert(0, int(round(self.U_segment_1,0)))
+
+        self.dU_segment_1_entry.delete(0, END)
+        self.dU_segment_1_entry.insert(0, int(round(self.dU_segment_1,0)))
+
+        self.TR1_entry.delete(0, END)
+        self.TR1_entry.insert(0, int(round(self.entry_voltages['U_TR1_loading'],0)))
+
+        self.TL1_entry.delete(0, END)
+        self.TL1_entry.insert(0, int(round(self.entry_voltages['U_TL1_loading'],0)))
+
+        self.BL1_entry.delete(0, END)
+        self.BL1_entry.insert(0, int(round(self.entry_voltages['U_BL1_loading'],0)))
+
+        self.BR1_entry.delete(0, END)
+        self.BR1_entry.insert(0, int(round(self.entry_voltages['U_BR1_loading'],0)))
+
+        self.U_segment_2_entry.delete(0, END)
+        self.U_segment_2_entry.insert(0, int(round(self.U_segment_2,0)))
+
+        self.dU_segment_2_entry.delete(0, END)
+        self.dU_segment_2_entry.insert(0, int(round(self.dU_segment_2,0)))
+
+        self.TR2_entry.delete(0, END)
+        self.TR2_entry.insert(0, int(round(self.entry_voltages['U_TR2_loading'],0)))
+
+        self.TL2_entry.delete(0, END)
+        self.TL2_entry.insert(0, int(round(self.entry_voltages['U_TL2_loading'],0)))
+
+        self.BL2_entry.delete(0, END)
+        self.BL2_entry.insert(0, int(round(self.entry_voltages['U_BL2_loading'],0)))
+
+        self.BR2_entry.delete(0, END)
+        self.BR2_entry.insert(0, int(round(self.entry_voltages['U_BR2_loading'],0)))
+        self.U_segment_3_entry.delete(0, END)
+        self.U_segment_3_entry.insert(0, int(round(self.U_segment_3, 0)))
+
+        self.dU_segment_3_entry.delete(0, END)
+        self.dU_segment_3_entry.insert(0, int(round(self.dU_segment_3, 0)))
+
+        self.TR3_entry.delete(0, END)
+        self.TR3_entry.insert(0, int(round(self.entry_voltages['U_TR3_loading'], 0)))
+
+        self.TL3_entry.delete(0, END)
+        self.TL3_entry.insert(0, int(round(self.entry_voltages['U_TL3_loading'], 0)))
+
+        self.BL3_entry.delete(0, END)
+        self.BL3_entry.insert(0, int(round(self.entry_voltages['U_BL3_loading'], 0)))
+
+        self.BR3_entry.delete(0, END)
+        self.BR3_entry.insert(0, int(round(self.entry_voltages['U_BR3_loading'], 0)))
+
+        self.U_segment_4_entry.delete(0, END)
+        self.U_segment_4_entry.insert(0, int(round(self.U_segment_4, 0)))
+
+        self.dU_segment_4_entry.delete(0, END)
+        self.dU_segment_4_entry.insert(0, int(round(self.dU_segment_4, 0)))
+
+        self.TR4_entry.delete(0, END)
+        self.TR4_entry.insert(0, int(round(self.entry_voltages['U_TR4_loading'], 0)))
+
+        self.TL4_entry.delete(0, END)
+        self.TL4_entry.insert(0, int(round(self.entry_voltages['U_TL4_loading'], 0)))
+
+        self.BL4_entry.delete(0, END)
+        self.BL4_entry.insert(0, int(round(self.entry_voltages['U_BL4_loading'], 0)))
+
+        self.BR4_entry.delete(0, END)
+        self.BR4_entry.insert(0, int(round(self.entry_voltages['U_BR4_loading'], 0)))
+
+        self.U_segment_5_entry.delete(0, END)
+        self.U_segment_5_entry.insert(0, int(round(self.U_segment_5, 0)))
+
+        self.dU_segment_5_entry.delete(0, END)
+        self.dU_segment_5_entry.insert(0, int(round(self.dU_segment_5, 0)))
+
+        self.TR5_entry.delete(0, END)
+        self.TR5_entry.insert(0, int(round(self.entry_voltages['U_TR5_loading'], 0)))
+
+        self.TL5_entry.delete(0, END)
+        self.TL5_entry.insert(0, int(round(self.entry_voltages['U_TL5_loading'], 0)))
+
+        self.BL5_entry.delete(0, END)
+        self.BL5_entry.insert(0, int(round(self.entry_voltages['U_BL5_loading'], 0)))
+
+        self.BR5_entry.delete(0, END)
+        self.BR5_entry.insert(0, int(round(self.entry_voltages['U_BR5_loading'], 0)))
+
+        self.U_exit_loading_entry.delete(0, END)
+        self.U_exit_loading_entry.insert(0, int(round(self.entry_voltages['U_exit_loading'], 0)))
+
 
     # Updates the set voltage values
     def updateSetV(self):
@@ -795,6 +921,43 @@ class Thorium():
             self.U_loading_plate_bool = value
             print('Loading Plate power button pressed')
         self.multiple = True
+
+
+    def saveParameters(self):
+        try:
+            newfile = filedialog.asksaveasfilename(initialdir = self.work_dir,title = "Save current parameters to file",filetypes = (("all files","*.*"),("all files","*.*")))
+        except:
+            newfile = filedialog.asksaveasfilename(initialdir = desktop,title = "Save current parameters to file",filetypes = (("all files","*.*"),("all files","*.*")))
+        if newfile == '':
+            return
+        folders = newfile.split('/')
+        self.work_dir = '/'.join(folders[:-1])
+
+        with open(newfile, 'w') as f:
+            for name, entry in self.actual_voltages.items():
+                f.write(name + ': ' + str(entry) + '\n')
+        f. close()
+        print('Parameters saved to file: ', newfile)
+
+    def importParameters(self):
+        try:
+            newfile = filedialog.askopenfilename(initialdir = self.work_dir,title = "Select file",filetypes = (("all files","*.*"),("all files","*.*")))
+        except:
+            newfile = filedialog.askopenfilename(initialdir = desktop,title = "Select file",filetypes = (("all files","*.*"),("all files","*.*")))
+        if newfile == '':
+            return
+        folders = newfile.split('/')
+        self.work_dir = '/'.join(folders[:-1])
+
+        with open(newfile, 'r') as f:
+            for line in f:
+                name, value = line.split(': ')
+                self.set_voltages[name] = float(value)
+        f.close()
+        self.entry_voltages = self.set_voltages.copy()
+        self.populateEntryV()
+        print('Parameters imported from file: ', newfile)
+
     
     #Opens About Window with description of software
     def About(self):
@@ -863,12 +1026,12 @@ class Thorium():
         #Creates File menu
         self.filemenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="File", menu=self.filemenu)
-        #filemenu.add_command(label="Import", command=lambda: self.askopenfile(), accelerator="Ctrl+I")
-        #filemenu.add_command(label="Save", command=lambda: CSA.saveGraph(), accelerator="Ctrl+S")
+        self.filemenu.add_command(label="Import", command=lambda: self.importParameters(), accelerator="Ctrl+I")
+        self.filemenu.add_command(label="Save", command=lambda: self.saveParameters(), accelerator="Ctrl+S")
         #filemenu.add_command(label='Settings', command=lambda: self.Settings())
         #filemenu.add_command(label='Calibrate', command=lambda: self.calibration())
         self.filemenu.add_separator()
-        self.filemenu.add_command(label='New Window', command=lambda: startProgram(Toplevel(self.root)))
+        #self.filemenu.add_command(label='New Window', command=lambda: startProgram(Toplevel(self.root)))
         self.filemenu.add_command(label='Exit', command=lambda: self.quitProgram())
 
         #Creates Help menu
